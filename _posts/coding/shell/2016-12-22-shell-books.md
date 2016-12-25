@@ -53,3 +53,6 @@
 
 	http://sebug.net/paper/books/awk/
 
+- shell 运算符
+
+	http://blog.csdn.net/brandohero/article/details/8521640
