@@ -1,5 +1,23 @@
+## udev 介绍 ##
+http://www.ibm.com/developerworks/cn/linux/l-cn-udev/index.html?ca=drs-cn-0304
 
-## 常用工具大全--nice ## 
+## 网卡命名机制 ##
+1.传统命名：以太网eth[0,1,2,...],wlan[0,1,2,...]
+2.udev支持多种不同的命名方案：UDEV是系统在用户空间探测内核空间，通过sys接口所输出的硬件设备，并配置的硬件设备的一种应用程序，在centos7上UDEV支持多种不同的命名方案，无非就是支持基于固件的命名（firmware,基于主板上rom芯片）或者是通过总线拓扑（PCI总线）结构来命名。总线拓扑（PCI总线）结构命名主要是根据对应设备所在的位置来命名，slot设备上的第几个接口方式命名，这样命名的方式就是能够实现自动命名，只要接口不坏，无论是哪一块网卡插上去其名称一定是固定的。
+名称组成格式：  
+
+- en: ethernet  
+- wl: wlan(无线网卡）  
+- ww: wwan（广域网拨号）  
+
+名称类型：  
+
+- o<index>: 集成设备的设备索引号(基于主板上rom芯片)；
+- s<slot>: PCI-E扩展槽的索引号
+- x<MAC>: 基于MAC地址的命名；
+- p<bus>s<slot>:enp2s1
+
+## 常用工具大全--nice ##
 
 http://linuxtools-rst.readthedocs.io/zh_CN/latest/index.html  
 
@@ -74,27 +92,6 @@ cat op.tar.xz*>op.tar.gz
 
 ### 如何创建和解压tar.gz文件 ###
     tar zxvf filename.tar.gz
-
-## redhat update ## 
-配置 /etc/yum.repo.d/ 源
-
-$ cat linux-ftp.repo  
-[rhel$releasever]  
-name=Red Hat Enterprise Linux $releasever  
-baseurl=http://linux-ftp.sh.intel.com/pub/ISO/redhat/redhat-rhel/RHEL-7.3-Snapshot-4/Server/x86_64/os/  
-enabled=1  
-gpgcheck=0  
-
-[rhel6_optional]  
-name=Red Hat Enterprise Linux rhel6_optional  
-baseurl=http://linux-ftp.sh.intel.com/pub/ISO/redhat/redhat-rhel/RHEL-7.3-Snapshot-4/Server-optional/x86_64/os/  
-enabled=1  
-gpgcheck=0  
-
-
-执行 update
-
-	# yum update
 
 ## How to search function header file ##
 Please do not use non-standard header files (e.g. malloc.h,linux/fcntl.h). They can cause portability problems, such as what Paul encountered.
