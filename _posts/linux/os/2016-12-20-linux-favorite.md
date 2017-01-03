@@ -1,4 +1,8 @@
+## 提取ISO 文件夹里面的文件
 
+	mkdir /mnt/iso  
+	mount -o loop *.iso /mnt/iso
+	ls /mnt/iso
 
 ## 修改时区和时间
 **时区**
