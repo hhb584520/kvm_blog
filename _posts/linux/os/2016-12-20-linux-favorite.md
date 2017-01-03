@@ -1,3 +1,65 @@
+
+
+## 修改时区和时间
+**时区**
+
+查看当前时区
+	date -R
+
+修改设置时区
+    方法(1)：tzselect  
+    方法(2)：timeconfig //仅限于RedHat Linux 和 CentOS            
+    方法(3)：dpkg-reconfigure tzdata //适用于Debian
+            
+复制相应的时区文件，替换系统时区文件；或者创建链接文件
+
+	cp /usr/share/zoneinfo/$主时区/$次时区 /etc/localtime
+
+在中国可以使用：
+
+	cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+**时间**
+
+查看时间和日期
+
+    date
+
+设置时间和日期
+
+    将系统日期设定成1996年6月10日的命令
+    date -s 06/22/96
+
+    将系统时间设定成下午1点52分0秒的命令
+    date -s 13:52:00 
+
+将当前时间和日期写入BIOS，避免重启后失效
+
+    hwclock -w
+
+
+## 强制 Umount NFS ##
+当Umount一个目录时，提示device is busy，umount加参数f，是强制执行umount，但是许多时候均不会成功。 原理上要想umount，首先要kill正在使用这个目录的进程。假设无法卸载的设备为/dev/sdb1 
+
+1)运行下面命令看一下哪个用户哪个进程占用着此设备  
+
+	fuser -m -v /dev/sdb1
+
+2)运行下面命令杀掉占用此设备的进程 
+
+	fuser -m -v -k /dev/sdb1 
+	或者fuser -m -v -k -i  /dev/sdb1(每杀掉一下进程会让你确认） 
+
+3)再umount
+
+*杀掉所有以任何形式访问文件系统 /dev/sdb1的进程： 
+$fuser -km /dev/sdb1 
+这个办法是一个比较粗鲁的办法，通常适用于在测试等非正式环境。比较正规的要配合ps等命令，查出使用的用户、进程、命令等，然后做出综合判断，必要时先通知(signal或口头等)用户，确认安全时才可以强制kill此进程。 
+但有时fuser执行时，仍然会有报错，其实umount强制退出，可以考虑用参数l（Lazy），这个参数是比f(Force)更强大的终极命令。 
+Man Umount 查看f和l的参数说明如下： 
+-f     Force  unmount.  This  allows  an  NFS-mounted  filesystem  to be unmounted if the NFS server is unreachable. Note: when using umount -f on an NFS filesystem, the filesystem must be mounted using either the soft, or intr options (see nfs(5).  This option  will  not  force  unmount  a  <A1><AE>busy<A1><AF>  filesystem  (use  -l instead). (Requires kernel 2.1.116 or later.)
+-l     Lazy unmount. Detach the filesystem from the filesystem hierarchy now, and cleanup all references to the filesystem as soon as it is not busy anymore. This option allows a <A1><AE>busy<A1><AF> filesystem to be unmounted.  (Requires kernel 2.4.11 or later.) 
+
 ## udev 介绍 ##
 http://www.ibm.com/developerworks/cn/linux/l-cn-udev/index.html?ca=drs-cn-0304
 
