@@ -1,3 +1,65 @@
+## 安装 自己编译 Driver ##
+下面以 sgx driver 为例
+git clone https://github.com/01org/linux-sgx-driver.git
+
+### for redhat
+
+Build the Intel(R) SGX Driver
+
+To build Intel SGX driver, change the directory to the driver path and enter the following command:
+
+	$ make
+You can find the driver isgx.ko generated in the same directory.
+
+Install the Intel(R) SGX Driver
+
+To install the Intel SGX driver, enter the following command with root privilege:
+
+	$ sudo mkdir -p "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"    
+	$ sudo cp isgx.ko "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"    
+	$ sudo /sbin/depmod
+	$ sudo /sbin/modprobe isgx
+
+Uninstall the Intel(R) SGX Driver
+
+Before uninstall the Intel SGX driver, make sure the aesmd service is stopped. See the topic, Start or Stop aesmd Service, on how to stop the aesmd service.
+To uninstall the Intel SGX driver, enter the following commands:
+
+	$ sudo /sbin/modprobe -r isgx
+	$ sudo rm -rf "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"
+	$ sudo /sbin/depmod
+	$ sudo /bin/sed -i '/^isgx$/d' /etc/modules
+
+### for ubuntu
+
+Build the Intel(R) SGX Driver
+
+To build Intel SGX driver, change the directory to the driver path and enter the following command:
+
+	$ make
+You can find the driver isgx.ko generated in the same directory.
+
+Install the Intel(R) SGX Driver
+
+To install the Intel SGX driver, enter the following command with root privilege:
+
+	$ sudo mkdir -p "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"    
+	$ sudo cp isgx.ko "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"    
+	$ sudo sh -c "cat /etc/modules | grep -Fxq isgx || echo isgx >> /etc/modules"    
+	$ sudo /sbin/depmod
+	$ sudo /sbin/modprobe isgx
+
+Uninstall the Intel(R) SGX Driver
+
+Before uninstall the Intel SGX driver, make sure the aesmd service is stopped. See the topic, Start or Stop aesmd Service, on how to stop the aesmd service.
+To uninstall the Intel SGX driver, enter the following commands:
+
+	$ sudo /sbin/modprobe -r isgx
+	$ sudo rm -rf "/lib/modules/"`uname -r`"/kernel/drivers/intel/sgx"
+	$ sudo /sbin/depmod
+	$ sudo /bin/sed -i '/^isgx$/d' /etc/modules
+
+
 ## 提取ISO 文件夹里面的文件
 
 	mkdir /mnt/iso  
