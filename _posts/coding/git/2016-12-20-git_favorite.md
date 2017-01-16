@@ -35,6 +35,8 @@
     git format-patch -1 -o .            # one patch will be generated
     or
     git format-patch -n HEAD~3      #3 patches will be generated, their names look like [PATCH n/3] (n=1,2,3)
+    or
+    git format-patch -1 commit ：生成的patch有统计信息和git的版本信息
 
     和 master 比较，把所有不同的 patch 放到一个文件夹里面
     git format-patch -M master -o outgoing
