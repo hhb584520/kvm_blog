@@ -1,3 +1,23 @@
+## 查看系统是64位还是32位 ##
+1、getconf LONG_BIT or getconf WORD_BIT
+2、file /bin/ls
+3、lsb_release -a
+
+## 查看Linux的内核版本 ##
+
+cat /proc/version 
+
+## 查看Linux的发行版 ##
+登录到服务器执行 lsb_release -a ,即可列出所有版本信息,例如:
+   [root@3.5.5Biz-46 ~]# [root@q1test01 ~]# lsb_release -a
+   LSB Version:    :core-3.0-amd64:core-3.0-ia32:core-3.0-noarch:graphics-3.0-amd64:graphics-3.0-
+   ia32:graphics-3.0-noarch
+   Distributor ID: RedHatEnterpriseAS
+   Description:    Red Hat Enterprise Linux AS release 4 (Nahant Update 2)
+   Release:        4
+   Codename:       NahantUpdate2
+   注:这个命令适用于所有的linux，包括Redhat、SuSE、Debian等发行版。
+
 ## 安装 自己编译 Driver ##
 下面以 sgx driver 为例
 git clone https://github.com/01org/linux-sgx-driver.git
