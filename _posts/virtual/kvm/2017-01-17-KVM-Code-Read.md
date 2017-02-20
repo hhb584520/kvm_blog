@@ -3,7 +3,7 @@
 
 这里主要介绍基于x86平台的Guest Os, Qemu, Kvm工作流程，如图，通过KVM APIs可以将qemu的command传递到kvm：
 
-![](/kvm_blog/img/qemu_kvm_create_vm.jpg)
+![](/kvm_blog/img/qemu_kvm_create_vm.png)
 
 
 ## 1.创建VM ##
