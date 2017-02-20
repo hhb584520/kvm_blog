@@ -37,7 +37,7 @@
 
 Qemu通过KVM APIs进入KVM后，KVM会切入Guest OS，假如Guest OS运行中，需要访问IO等，也就是说要访问physical device，那么Qemu与KVM就要进行emulate。 如果是KVM emulate的则由KVM emulate，然后切回Guest OS。如果是Qemu emulate的，则从KVM中进入Qemu，等Qemu中的device model执行完emulate之后，再次在Qemu中调用kvm_vcpu_ioctl(vcpu_fd, KVM_RUN, xxx)进入KVM运行，然后再切回Guest OS.
 
-![](/kvm_blog/img/kvm_code_analy.jpg)
+![](/kvm_blog/img/kvm_code_analy.png)
 
 Qemu是一个应用程序，所以入口函数当然是main函数，但是一些被type_init修饰的函数会在main函数之前运行。这里分析的代码是emulate x86 的一款i440板子。main函数中会调用在main函数中会调用kvm_init函数来创建一个VM(virtual machine)，然后调用机器硬件初始化相关的函数，对PCI，memory等进行emulate。然后调用qemu_thread_create创建线程，这个函数会调用pthread_create创建一个线程，每个VCPU依靠一个线程来运行。在线程的处理函数qemu_kvm_cpu_thread_fn中，会调用kvm_init_vcpu来创建一个VCPU(virtual CPU)，然后调用kvm_vcpu_ioctl，参数KVM_RUN，这样就进入KVM中了。进入KVM中第一个执行的函数名字相同，也叫kvm_vcpu_ioctl，最终会调用到kvm_x86_ops->run()进入到Guest OS，如果Guest OS要写某个端口，会产生一条IO instruction，这时会从Guest OS中退出，调用kvm_x86_ops->handle_exit函数，其实这个函数被赋值为vmx_handle_exit，最终会调用到kvm_vmx_exit_handlers[exit_reason](vcpu)，kvm_vmx_exit_handlers是一个函数指针，会根据产生事件的类型来匹配使用那个函数。这里因为是ioport访问产生的退出，所以选择handle_io函数。
 
@@ -81,9 +81,9 @@ Qemu是一个应用程序，所以入口函数当然是main函数，但是一些
 
 如果KVM中的handle_io函数可以处理，那么处理完了再次切入Guest OS。如果是在Qemu中emulate，那么在KVM中的代码执行完后，会再次回到Qemu中，调用Qemu中的kvm_handle_io函数，如果可以处理，那么再次调用kvm_vcpu_ioctl，参数KVM_RUN，进入KVM，否则出错退出。
 
-## KVM API 类型 ##
+## 4. KVM API 类型 ##
 
-### System指令(system ioctls) ###
+### 4.1 System指令(system ioctls) ###
 
 针对虚拟化系统的全局性参数设置和用于虚拟机创建等控制操作。
 KVM_GET_API_VERSION          查询当前 KVM API 的版本。
@@ -92,18 +92,23 @@ KVM_GET_MSR_INDEX_LIST    创建 MSR 索引列表。
 KVM_CHECK_EXTENSION        检查扩展支持情况。
 KVM_GET_VCPU_MMAP_SIZE 运行虚拟机和用户态空间共享的一片内存区域大小。
     
-### 1.2 VM指令(vm ioctls) ###
+### 4.2 VM指令(vm ioctls) ###
 针对虚拟化系统的全局性参数设置和用于虚拟机创建等控制操作。
 KVM_CREATE_VCPU                为已经创建好的VM添加vCPU。
 KVM_RUN                                根据 kvm_run 结构体的信息，启动 VM 虚拟机。
         ...........
  
-### 1.3 VM指令(vm ioctls) ###
+### 4.3 VM指令(vm ioctls) ###
 针对虚拟化系统的全局性参数设置和用于虚拟机创建等控制操作。
 KVM_CREATE_VCPU         为已经创建好的VM添加vCPU。
 KVM_RUN                 根据 kvm_run 结构体的信息，启动 VM 虚拟机。
 
 main->cpu_init->cpu_x86_init->x86_cpu_realize->qemu_init_vcpu->qemu_kvm_start_vcpu->qemu_kvm_cpu_thread_fn->kvm_init_vcpu->mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
+
+## 5. QEMU的核心初始化流程 ##
+客户系统运行之前，QEMU作为全系统模拟软件，需要为客户系统模拟出CPU、主存以及I/O设备，使客户系统就像运行在真实硬件之上，而不用对客户系统代码做修改。如概览部分所示，由用户为客户系统指定需要的虚拟CPU资源（包括CPU核心数，SOCKET数目，每核心的超线程数，是否开启NUMA等等），虚拟内存资源，具体参数设置参见${QEMU}/qemu-options.hx。创建QEMU主线程，执行QEMU系统的初始化，在初始化的过程中针对每一个虚拟CPU，单独创建一个posix线程。每当一个虚拟CPU线程被调度到物理CPU上执行时，该VCPU对应的一套完整的寄存器集合被加载到物理CPU上，通过VM-LAUNCH或VM-RESUME指令切换到非根模式执行。直到该线程时间片到，或者其它中断引发虚拟机退出，VCPU退出到根模式，进行异常处理。
+
+如下图所示，当用户运行QEMU的System Mode的可执行文件时，QEMU从${QEMU}/vl.c的main函数执行主线程。以下着重分析，客户系统启动之前，QEMU所做的初始化工作：
 
 ## 参考资料: ##
 1. qemu-kvm的初始化与客户系统的执行:http://blog.csdn.net/lux_veritas/article/details/9383643
