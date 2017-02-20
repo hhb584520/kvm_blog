@@ -110,6 +110,21 @@ main->cpu_init->cpu_x86_init->x86_cpu_realize->qemu_init_vcpu->qemu_kvm_start_vc
 
 如下图所示，当用户运行QEMU的System Mode的可执行文件时，QEMU从${QEMU}/vl.c的main函数执行主线程。以下着重分析，客户系统启动之前，QEMU所做的初始化工作：
 
+![](/kvm_blog/img/pc_init1.jpg)
+
+## 5.1 选择虚拟化方案： ##
+configure_accelerator()函数，选择使用哪种虚拟化解决方案。
+
+本文主要针对kvm这种硬件辅助的虚拟化解决方案。
+	2468 static void kvm_accel_class_init(ObjectClass *oc, void *data)
+	2469 {
+	2470     AccelClass *ac = ACCEL_CLASS(oc);
+	2471     ac->name = "KVM";
+	2472     ac->init_machine = kvm_init;
+	2473     ac->allowed = &kvm_allowed;
+	2474 }
+
+
 ## 参考资料: ##
 1. qemu-kvm的初始化与客户系统的执行:http://blog.csdn.net/lux_veritas/article/details/9383643
 2. 内核虚拟化kvm/qemu----guest os,kvm,qemu工作流程:http://www.360doc.com/content/12/0619/13/7982302_219186951.shtml
