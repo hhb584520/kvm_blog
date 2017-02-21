@@ -93,6 +93,9 @@ vim **xen-rhel7-epc-passthrough.conf**
 
 
 # 参考资料 #
-2012-forum-VFIO.pdf
-VT-d Posted Interrupts-final.pdf
-[vt-directed-io-spec.pdf	](/kvm_blog/files/vt-directed-io-spec.pdf)
+
+[2012-forum-VFIO.pdf](/kvm_blog/files/2012-forum-VFIO.pdf)
+
+[VT-d-Posted-Interrupts-final.pdf](/kvm_blog/files/VT-d_Posted_Interrupts_final.pdf)
+
+[vt-directed-io-spec.pdf](/kvm_blog/files/vt-directed-io-spec.pdf)
