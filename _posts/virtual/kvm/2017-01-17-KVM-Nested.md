@@ -28,3 +28,6 @@ KVM 对 “KVM嵌套KVM”的支持从 2010 年开始了，目前已经比较成
 4) 在 L2 客户机中查看是否正常运行。
 
 
+# 2. 参考资料 #
+
+[NestedVirtualization.pdf](/kvm_blog/files/NestedVirtualization.pdf)
