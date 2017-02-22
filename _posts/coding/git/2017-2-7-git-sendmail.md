@@ -1,8 +1,7 @@
 # Git send patch mail #
 
-## 1. 先配置git send-mail 的 smtp服务器 ##
-### 1.1 安装git-email ###
-
+## 1. Install and config git send-mail smtp ##
+### 1.1 Install git-email ###
   $ apt-get install git git-core git-email
   $ vim ~/.gitconfig
 
@@ -44,7 +43,7 @@ commit message 第一行要是patch的主题(包括patch的从属子系统，和
      b）git reset到那个commit，如要更改或添加某个文件，git add; 如要删除某个commit的文件，(git reset HEAD^ file),然后 commit --amend
      c）git am *.patch (不用git apply，因为apply命令只将patch应用到index，而不会将commit message同时应用到git仓库上。如果当前目录下之前执行过git-am，而没有发送email，需要先执行git am --abort放弃掉之前的am信息。遇到了一次abort不掉的时候，执行rm -rf .git/rebase-apply/就可以了，参照如下Linkhttp://git.661346.n2.nabble.com/Dangerous-quot-git-am-abort-quot-behavior-td5853324.html)
 
-### 2.2 生成patch ###
+### 2.2 Create patch ###
 
 git format-patch -2 --cover-letter//2表示从HEAD的commit开始，向前生成两个commit的patch。--cover-letter会生成一个0000-cover-letter.patch，格式和commit message类似，第一行是patchset的主题，第二行描述这组patchset的详细信息，它就是邮件中的【PATCH 0/n】(有必要的话，将测试结果和基于的主线版本写在0000-cover-letter.patch中的详细描述中)。
 
