@@ -39,8 +39,9 @@ If you want boot a OVMF guest, you can enable the Ovmf option like this:
 [root@vt xen]#./configure --enable-ovmf
 
 **Make xen**  
+
 	[root@vt xen]#make xen -j $num_cpu  # ‘-j $num_cpu’ 
-	. Make tools, install xen & tools
+	. Make tools, install xen & tools  
 	[root@vt xen-unstable.hg]#make tools -j $num_cpu  
 	[root@vt xen-unstable.hg]#make install-xen  
 	[root@vt xen-unstable.hg]#make install-tools 
@@ -114,6 +115,7 @@ For qemu.git
 	./configure --enable-xen --target-list=i386-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
 
 ia32e
+
 	./configure --enable-xen --target-list=x86_64-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
 
 NOTE: you may need to build xen and xen tools first.
