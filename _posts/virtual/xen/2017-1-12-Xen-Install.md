@@ -110,19 +110,23 @@ make install
 NOTE: It'll install to /usr/local/ by default
 For qemu.git
 
-x86
-./configure --enable-xen --target-list=i386-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
+**x86**
+
+	./configure --enable-xen --target-list=i386-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
+
 ia32e
-./configure --enable-xen --target-list=x86_64-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
+	./configure --enable-xen --target-list=x86_64-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
+
 NOTE: you may need to build xen and xen tools first.
 Please add following two lines in xen configuration file:
 device_model_override = '/usr/local/bin/qemu-system-x86_64'
 device_model_version = 'qemu-xen'
 NOTE: ‘device_module_override’ indicates the directory your qemu binary is installed in.
-Add a external wiki link: http://wiki.xen.org/wiki/QEMU_Upstream#How_to_build_QEMU_with_Xen
 
-Pasted from: http://vmm-qa.sh.intel.com/qawiki/how_to_use_upstream_QEMU_for_Xen
+# 2. RPM Install #
 
+	# wget http://vmm-build.sh.intel.com/curia/xen-unstable_75da1b15_20170219-1.x86_64.rpm
+    # rpm -ivh xen-unstable_75da1b15_20170219-1.x86_64.rpm
 
 # 3. Verify #
 ## 3.1 Reboot the system ##
@@ -187,15 +191,18 @@ Reboot the system, start system via ‘xen-32e’ grub entry, and login. . Start
 
 **Xen**
 
-- 给配置文件添加
+vm config 
 	
 	serial='pty'
 
-- 给guest的 grub添加，你要把rhgb quiet 去掉，然后加上 console=ttyS0,115200,8n1  
+grub
 
-- console
+    delete "rhgb quiet"
+    add "console=ttyS0,115200,8n1"
+ 
+how to use
 	
-xl console domid
+	xl console domid
 
 # 4. Problem #
 ## 4.1 xl list ##
@@ -205,7 +212,7 @@ xl console domid
 	libxl: error: libxl.c:108:libxl_ctx_alloc: cannot open libxc handle: No such file or directory
 	cannot init xl context
 
-一般是因为启动的不是 Xen, 请检查 grub
+Maybe you don't boot xen, please check grub
 
 ## 4.2 ksmtuned not found ##
 /usr/sbin/ksmtuned: line 66: /sys/kernel/mm/ksm/run: No such file or directory
