@@ -1,16 +1,14 @@
-# Xen 环境搭建
-
-# 1. 源码安装 #
-## 1.1 安装相关包 ##
+# 1. Source Install #
+## 1.1 Install dependency Package ##
 yum install libaio-devel yajl yajl-devel libuuid-devel dev86 iasl glibc.i686 glib2 glib2-devel glibc-devel trousers trousers-devel SDL-devel pciutils-devel mercurial ncurses-devel openssl-devel  curl-devel pixman-devel nss* nmap* -y 
 
-## 1.2 创建目录下载包
+## 1.2 Create Directory 
 - [root@vt]#cd /   
 - [root@vt]#mkdir /home/build
 - [root@vt]#cd /home/build    
 - [root@vt build]#git clone git://vt-sync.sh.intel.com/xen.git
 
-## 1.3 编译
+## 1.3 Compile
 [root@vt-ivt1  build]#cd xen
 
 **modify the config disk type: xvda--->hda**
@@ -133,7 +131,7 @@ Reboot the system, start system via ‘xen-32e’ grub entry, and login. . Start
 	[root@vt /]#echo "/usr/local/lib" >>/etc/ld.so.conf
 	[root@vt /]#ldconfig
 	[root@vt /]# /etc/init.d/xencommons start 
-	也可以把上面的放到 /etc/rc.d/rc.local 里面，并设置可执行权限
+	we also can put 3 command to /etc/rc.d/rc.local, then give rc.local execute(chmod +x /etc/rc.d/rc.local)
 
 ## 3.2 Create VM ##
 .Verify whether xen works via ‘xl list’ and ‘xl info’ command, correct display is follows:
