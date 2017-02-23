@@ -64,8 +64,7 @@ If you want boot a OVMF guest, you can enable the Ovmf option like this:
 	[root@vt build]#scp xen-build.sh.intel.com:/home/build/repo/config-example linux-stable/.config 
 	[root@vt build]#cd linux-stable 
 	[root@vt linux-stable]#echo "" | make oldconfig  
-	[root@vt linux-stable]#make -j 8 
-	[root@vt linux-stable]#make modules -j 8  
+	[root@vt linux-stable]#make -j 32 
 	[root@vt linux-stable]#make modules_install  
 	[root@vt linux-stable]#make install  
 	. Verify. After finishing installing dom0, new files are generated in /boot directory
