@@ -57,6 +57,7 @@ git format-patch -v 2 -2 --cover-letter --subject-prefix="GET v2" -o PATH
 
 	git am -3 -i -s -u *.patch
   
-# Reference #
+## 3.Reference ##
   https://git-scm.com/docs/git-send-email
+
   
