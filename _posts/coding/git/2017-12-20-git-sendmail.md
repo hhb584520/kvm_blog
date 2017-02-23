@@ -2,7 +2,7 @@
 
 ## 1. Install and config git send-mail smtp ##
 ### 1.1 Install git-email ###
-  $ apt-get install git git-core git-email
+  $ apt-get install git git-core git-email  
   $ vim ~/.gitconfig
 
 	[color]
@@ -34,25 +34,28 @@
 ## 2.send mail and apply ##
 ### 2.1 Create patch ###
 
-git format-patch -2 --cover-letter
-git format-patch -v 2 -2
--v : add version
---subject-prefix : --subject-prefix="PATCH v2"
---cover-letter: create 0000-cover-letter.patch
--n : patch count
--
+git format-patch -v 2 -2 --cover-letter --subject-prefix="GET v2" -o PATH
+
+	-v : add version
+	--subject-prefix : --subject-prefix="PATCH v2"
+	--cover-letter: create 0000-cover-letter.patch
+	-n : patch count
+	-o : save patch path
+
 
 ### 2.2 send mail ###
+
   git send-email --confirm=never --to haibin.huang@intel.com --cc haibin.huang@intel.com *.patch
   
-  -n : patch count
-  --to: maillist
-  --cc: maillist
-  --confirm: never | always
+	-n : patch count
+	--to: maillist
+	--cc: maillist
+	--confirm: never | always
   
 ### 2.3 apply patch ###
   save mail txt and change file *.patch
-  git am -3 -i -s -u *.patch
+
+	git am -3 -i -s -u *.patch
   
 # Reference #
   https://git-scm.com/docs/git-send-email
