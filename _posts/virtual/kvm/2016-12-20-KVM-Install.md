@@ -58,47 +58,74 @@
 		# CONFIG_KVM_AMD is not set
 		CONFIG_KVM_MMU_AUDIT=y
 
-- Compile Kernel
+### 2.2.3 Complie new kernel and install ###
 
-	`make -j20`  
-	`make moules_install -j20`   
-	`make -install -j20`  
+		# make vmlinux -j 20 #-j is a parameter
+		# make bzImage -j 20
+		# make modules -j 20 
+		# make modules_install
+		# make install
+
+	a. after installed the kernel, vmlinuz and initrafms are generated under boot directory
+	or maybe you can use anthor way to build this module. 
+
+1). cp /boot/config-4.5.0-rc3 .config 
+2). make allyesconfig -j20 
+3). make modules -j20 
+4). make -20 
+5). make moules_install -j20 
+6). make -install -j20
+
+	b. check /boot/grub/grub.conf, a option of grub is added
+	menuentry 'Red Hat Enterprise Linux Server (4.5.0-rc4-12695-g0fb00d3) 7.2 (Maipo) with debugging' --class fedora --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulin
+	
+	ux-kvm-advanced-6afe35ac-ecf2-438b-83db-f3da76c2e709' {
+	        load_video	
+	        insmod gzio	
+	        insmod part_msdos	
+	        insmod ext2	
+	        set root='hd0,msdos3'	
+	        if [ x$feature_platform_search_hint = xy ]; then	
+	          search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos3 --hint-efi=hd0,msdos3 --hint-baremetal=ahci0,msdos3 --hint='hd0,msdos3'  6afe35ac-ecf2-438b-83db-f3da76c2e709	
+	        else	
+	          search --no-floppy --fs-uuid --set=root 6afe35ac-ecf2-438b-83db-f3da76c2e709	
+	        fi	
+	        linux16 /boot/vmlinuz-4.5.0-rc4-12695-g0fb00d3 root=UUID=6afe35ac-ecf2-438b-83db-f3da76c2e709 ro BOOT_IMAGE=/boot/vmlinuz-kvm root=UUID=6afe35ac-ecf2-438b-83db-f3da76c2e709 ro crashkernel=a	
+	uto rhgb quiet intel_iommu=on LANG=en_US.utf8 systemd.log_level=debug systemd.log_target=kmsg	
+	        initrd16 /boot/initramfs-4.5.0-rc4-12695-g0fb00d3.img
+	
+	}
 
    Reboot and boot into updated kernel
 
-### 2.2.3 Compile Qemu  ###
-- Build qemu.git 
- 
-    `# git clone git://vt-sync/qemu.git qemu.git`  
+- Build qemu.git  
+    `# git clone git://vt-sync/qemu.git qemu.git   ## clone qemu repo under `  
     `# cd qemu.git`   
 
-- you can check which branch of qemu  
- 
+- you can check which branch of qemu   
     `# git branch`
 
 - you can checkout to uq/master tree
-    
-	`# git checkout uq/master`
+    `# git checkout uq/master`
     
 - then compile the qemu  
-     
+    $ ./configure --target-list=x86_64-softmmu  
     $ ./configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --disable-gtk --disable-sdl # -display sdl
     Comments: Ctrl+Alt+2 --> info kvm 查看是否编译时候使用了 --enable-kvm  
     $ make   
     $ make install  
+   
 
 -  after qemu is installed, check kvm module
-    
-	$ lsmod | grep kvm  
+    $ lsmod | grep kvm  
     	kvm_intel 128177  0   
     	kvm   413542  1 kvm_intel  
     	If KVM modules is not loaded, load the modules manually  
     $ modprobe kvm  
     $ modprobe kvm_intel  
 
-# 3. Create VM
-## 3.1 Create a guest #
-
+# 3. 
+## 4.1 Create a guest #
 	$ qemu-img create -b /share/xvs/img/linux/ia32e_rhel7u2_ga.img -f qcow2 /root/rhel7u2.qcow2  
 	$ qemu-system-x86_64  -m 1024 -smp 4 -net nic,macaddr=xx.xx.xx.xx.xx.xx -net tap,script=/etc/kvm/qemu-ifup -hda /root/rhel7u2.qcow2 -display sdl  
 	when guest is boot up,you can check kvm status in qemu monitor  
@@ -107,20 +134,18 @@
 	if kvm is disable, you must add parameter "-enable-kvm" when you create guest.
 	$ qemu-system-x86_64 -enable-kvm -m 1024 -smp 4 -net nic,macaddr=xx.xx.xx.xx.xx.xx -net tap,script=/etc/kvm/qemu-ifup -hda /root/rhel7u2.qcow2
 
-## 3.2 Create Image
-
+## 4.2 Create Image
 	$ dd if=/dev/zero of=sles12.img bs=1M count=10240
     or 
 	qemu-img create ...
 	$ qemu-system-x86_64 -m 2048 -smp 4 -boot order=cd -hda sles12.img -cdrom sles12.iso
 	$ qemu-system-x86_64 -m 2048 -smp 4 -hda sles12.img 
 
-## 3.3 Install Virt-manager
-
+## 4.3 安装虚拟机管理工具
 　　apt-get install virt-manager  
 
-# 4. Problem  #
-## 4.1 No Enough Virtual Disk Space
+# 5. Problem  #
+## 5.1 No Enough Virtual Disk Space
 
 	环境配置：对于sda/vda等格式的硬盘　　
 	OS：centos 6.1　　

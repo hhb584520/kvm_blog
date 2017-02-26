@@ -42,8 +42,9 @@
 or
 
 	modprobe pci_stub
+	ls /sys/bus/pci/drivers/pci-stub/
 
-## 2.1 隐藏设备 ##
+## 2.2 隐藏设备 ##
 modprobe vfio-pci
 
 For Xen:
@@ -60,6 +61,9 @@ or
     # echo -n "$bdf" > /sys/bus/pci/devices/"$bdf"/driver/unbind
     # echo -n "$bdf" > /sys/bus/pci/drivers/pci-stub/bind
 
+在绑定前，用 lspci 命令查看BDF为 08:00.0的设备使用的驱动是 Intel 的 e1000e驱动，而绑定到 pci_stub 后，通过如下命令可以查看它目前使用驱动是 pci_stub 而不是 e1000e了，其中 lspci  -k 选项表示输出信息中显示正在使用的驱动和内核中可以支持该设备的模块。
+
+      # lspci -k -s 08:00.0
 
 For KVM:
 
@@ -67,11 +71,19 @@ For KVM:
 	  0000:01:00.0 ($bdf)
     # lspci -Dn -s "$bdf" | awk '{print $3}' | sed "s/:/ /"
       8086 105e  ($pciid)
+      8086(Vender ID) 105e(Device ID)
     # echo -n "$pciid" > /sys/bus/pci/drivers/vfio-pci/new_id
     # echo -n "$bdf" > /sys/bus/pci/devices/"$bdf"/driver/unbind
 	# echo -n "$bdf" > /sys/bus/pci/drivers/vfio-pci/bind
 
-## 2.2 显示设备 ##
+通过 QEMU命令行分配设备给客户机
+
+     # qemu-system-x86_64 -device ? (这里的问号可以查看有哪些可用的驱动)
+     # qemu-system-x86_64 rhel6u3.img -m 1024 -device pci-assign,host=08:00.0,id=mydev0,addr=0x6
+
+我们也可以在QEMU中采用 info pci 查看 pci 的相关设备。
+
+## 2.3 显示设备 ##
 
 For Xen:
 
@@ -85,7 +97,7 @@ For KVM:
     # echo -n "$bdf" > /sys/bus/pci/drivers/e1000e/bind
 
 
-## 2.3 配置文件 ##
+## 2.4 配置文件 ##
 
 vim **kvm-rhel7-epc-passthrough.sh**
 
@@ -128,29 +140,107 @@ Virtio半虚拟化设备方式的优点是实现了VIRTIO API，减少了VM-Exit
 
 而第3种方式叫做PCI设备直接分配（Device Assignment，或者PCI pass-through），它允许将宿主机中的物理PCI（或PCI-E）设备直接分配给客户机完全使用，正是本节要介绍的重点内容。较新的x86架构的主要硬件平台（包括服务器级、桌面级）都已经支持设备直接分配，其中Intel定义的I/O虚拟化技术规范为“Intel(R) Virtualization Technology for Directed I/O”（VT-d），而AMD的为“AMD-V”（也叫做IOMMU）。本节以KVM中使用Intel VT-d技术为例来进行介绍（当然AMD IOMMU也是类似的）。
 
-KVM虚拟机支持将宿主机中的PCI、PCI-E设备附加到虚拟化的客户机中，从而让客户机以独占方式访问这个PCI（或PCI-E）设备。通过硬件支持的VT-d技术将设备分配给客户机后，在客户机看来，设备是物理上连接在其PCI（或PCI-E）总线上的，客户机对该设备的I/O交互操作和实际的物理设备操作完全一样，这不需要（或者很少需要）Hypervisor（即KVM）的参与。
+KVM虚拟机支持将宿主机中的PCI、PCI-E设备附加到虚拟化的客户机中，从而让客户机以独占方式访问这个PCI（或PCI-E）设备。通过硬件支持的VT-d技术将设备分配给客户机后，在客户机看来，设备是物理上连接在其PCI（或PCI-E）总线上的，客户机对该设备的I/O交互操作和实际的物理设备操作完全一样，这不需要（或者很少需要）Hypervisor（即KVM）的参与。KVM中通过VT-d技术使用一个PCI-E网卡的系统架构示例如下图所示
+
+![](/kvm_blog/img/kvm-vtd-demo.jpg)
 
 运行在支持VT-d平台上的QEMU/KVM，可以分配网卡、磁盘控制器、USB控制器、VGA显卡等给客户机直接使用。而为了设备分配的安全性，它还需要中断重映射（interrupt remapping）的支持，尽管QEMU命令行进行设备分配时并不直接检查中断重映射功能是否开启，但是在通过一些工具使用KVM时（如RHEL6.3中的libvirt）默认需要有中断重映射的功能支持，才能使用VT-d分配设备给客户机使用。
 
 设备直接分配让客户机完全占有PCI设备，在执行I/O操作时大量地减少了（甚至避免）了VM-Exit陷入到Hypervisor中，极大地提高了I/O性能，可以达到和Native系统中几乎一样的性能。尽管Virtio的性能也不错，但VT-d克服了其兼容性不够好和CPU使用率较高的问题。不过，VT-d也有自己的缺点，一台服务器主板上的空间比较有限，允许添加的PCI和PCI-E设备是有限的，如果一个宿主机上有较多数量的客户机，则很难给每个客户机都独立分配VT-d的设备。另外，大量使用VT-d独立分配设备给客户机，让硬件设备数量增加，故增加了硬件投资成本。 为了避免这两个缺点，可以考虑采用如下两个方案。一是，在一个物理宿主机上，仅给少数的对I/O（如网络）性能要求较高的客户机使用VT-d直接分配设备（如网卡），而其余的客户机使用纯模拟（emulated）或使用Virtio以达到多个客户机共享同一个设备的目的。二是，对于网络I/O的解决方法，可以选择SR-IOV让一个网卡产生多个独立的虚拟网卡，将每个虚拟网卡分别分配给一个客户机使用，这也正是后面“SR-IOV技术”这一小节要介绍的内容。另外，它还有一个缺点是，对于使用VT-d直接分配了设备的客户机，其动态迁移功能将会受限，不过也可以在用bonding驱动等方式来缓解这个问题，将在“动态迁移”小节较为详细介绍此方法。
 
-## 3.1 
+## 3.1 硬盘直接分配
+
+在现代计算机系统中，一般 SATA或SAS等类型硬盘的控制器都是接入到PCI（PCIe）总线上的，所以也可以将硬盘作为普通的PCI设备直接分配给客户机使用。不过当 SATA或SAS设备直接分配给虚拟机时实际上将其控制器作为一个整体分配到客户机中，如果宿主机使用的硬盘也连接在同一个SATA和SAS控制器上，则不能将该控制器直接分配给客户机，而是需要硬件平台中至少有两个控制器。
+
+     a. 查看宿主机硬盘设备，并隐藏
+         ll /dev/disk/by-path/pci-0000\:16\:00.0-sas-0x12210000000000-lun-0
+         ll /dev/dsik/by-path/pci-0000\:00\:1f.2-scsi-0\:0\:0\:0\:0
+         lspci -k -s $bdf1
+         lspci -k -s $bdf2
+         fdisk -l /dev/sdb
+         df -h
+         ./pci_stub.sh -h $bdf2
+         lspci -k -s $bdf2
+      b. 将 sata 硬盘分配给客户机使用
+         qemu-system-x86_64 rhel6u3.img -smp 2 -m 1024 -device pci-assign,host=$bdf2,addr=0x6 -net nic -net tap
+      c. 在客户机中查看硬盘
+         fdisk -l /dev/sfb
+         ll /dev/dsik/by-path/pci-0000\:00\:04.0-scsi-2\:0\:0\:0\:0
+         lspci -k -s 00:06.0
 
 
+## 3.2 USB 直接分配
 
-## 3.2
+如果是U盘，基本和硬盘差不多，不再叙述
+如果分配的 SandDisk 的U盘设备
+
+      lsusb
+      qemu-system-x86_64 rhel6u3.img -smp 2 -m 1024 -usbdevice host=0781:5667 -net nic -net tap
 
 
+## 3.3 VGA 显卡直接分配
 
-## 3.3
+     dmesg | grep -e Keyboard -e Mouse
+     lsusb
+     lspci | grep -i VGA
+     qemu-system-x86_64 rhel6u3.img -smp 2 -m 1024 -device pci-assign,host=$bdf_usb \
+        -device pci-assign,host=$bdf_vga -net nic -net tap
 
+## 3.4 VFIO
 
+VFIO是一套用户态驱动框架，它提供两种基本服务：
 
-## 3.4
+- 向用户态提供访问硬件设备的接口
+- 向用户态提供配置IOMMU的接口
 
+VFIO由平台无关的接口层与平台相关的实现层组成。接口层将服务抽象为IOCTL命令，规化操作流程，定义通用数据结构，与用户态交互。实现层完成承诺的服务。据此，可在用户态实现支持DMA操作的高性能驱动。在虚拟化场景中，亦可借此完全在用户态实现device passthrough。
+
+VFIO实现层又分为设备实现层与IOMMU实现层。当前VFIO仅支持PCI设备。IOMMU实现层则有x86与PowerPC两种。VFIO设计灵活，可以很方便地加入对其它种类硬件及IOMMU的支持。
+
+### 3.4.1 接口 ###
+
+与KVM一样，用户态通过IOCTL与VFIO交互。可作为操作对象的几种文件描述符有：
+
+- Container文件描述符
+	
+	打开/dev/vfio字符设备可得
+
+- IOMMU group文件描述符
+
+	打开/dev/vfio/N文件可得 (详见后文)
+
+- Device文件描述符
+
+	向IOMMU group文件描述符发起相关ioctl可得
+
+逻辑上来说，IOMMU group是IOMMU操作的最小对象。某些IOMMU硬件支持将若干IOMMU group组成更大的单元。VFIO据此做出container的概念，可容纳多个IOMMU group。打开/dev/vfio文件即新建一个空的container。在VFIO中，container是IOMMU操作的最小对象。
+
+要使用VFIO，需先将设备与原驱动拨离，并与VFIO绑定。
+
+用VFIO访问硬件的步骤：
+
+- 打开设备所在IOMMU group在/dev/vfio/目录下的文件
+- 使用VFIO_GROUP_GET_DEVICE_FD得到表示设备的文件描述 (参数为设备名称，一个典型的PCI设备名形如0000:03.00.01)
+- 对设备进行read/write/mmap等操作
+
+用VFIO配置IOMMU的步骤：
+
+- 打开/dev/vfio，得到container文件描述符
+- 用VFIO_SET_IOMMU绑定一种IOMMU实现层
+- 打开/dev/vfio/N，得到IOMMU group文件描述符
+- 用VFIO_GROUP_SET_CONTAINER将IOMMU group加入container
+- 用VFIO_IOMMU_MAP_DMA将此IOMMU group的DMA地址映射至进程虚拟地址空间
+
+### 3.4.2 逻辑 ###
+VFIO设备实现层与Linux设备模型紧密相连，当前，VFIO中仅有针对PCI的设备实现层(实现在vfio-pci模块中)。设备实现层的作用与普通设备驱动的作用类似。普通设备驱动向上穿过若干抽象层，最终以Linux里广为人知的抽象设备(网络设备，块设备等等)展现于世。VFIO设备实现层在/dev/vfio/目录下为设备所在IOMMU group生成相关文件，继而将设备暴露出来。两者起点相同，最终呈现给用户态不同的接口。欲使设备置于VFIO管辖之下，需将其与旧驱动解除绑定，由VFIO设备实现层接管。用户态能感知到的，是一个设备的消失(如eth0)，及/dev/vfio/N文件的诞生(其中N为设备所在IOMMU group的序号)。由于IOMMU group内的设备相互影响，只有组内全部设备被VFIO管理时，方能经VFIO配置此IOMMU group。
+
+把设备归于IOMMU group的策略由平台决定。在PowerNV平台，一个IOMMU group与一个PE对应。PowerPC平台不支持将多个IOMMU group作为更大的IOMMU操作单元，故而container只是IOMMU group的简单包装而已。对container进行的IOMMU操作最终会被路由至底层的IOMMU实现层，这实际上将用户态与内核里的IOMMU驱动接连了起来。
+
+### 3.4.3 总结 ###
+
+VFIO是一套用户态驱动框架，可用于编写高效用户态驱动；在虚拟化情景下，亦可用来在用户态实现device passthrough。通过VFIO访问硬件并无新意，VFIO可贵之处在于第一次向用户态开放了IOMMU接口，能完全在用户态配置IOMMU，将DMA地址空间映射进而限制在进程虚拟地址空间之内。这对高性能用户态驱动以及在用户态实现device passthrough意义重大。
 
 # 参考资料 #
-
 [2012-forum-VFIO.pdf](/kvm_blog/files/2012-forum-VFIO.pdf)
 
 [VT-d-Posted-Interrupts-final.pdf](/kvm_blog/files/VT-d_Posted_Interrupts_final.pdf)
