@@ -126,6 +126,20 @@ configure_accelerator()函数，选择使用哪种虚拟化解决方案。
 
 
 ## 参考资料: ##
-1. qemu-kvm的初始化与客户系统的执行:http://blog.csdn.net/lux_veritas/article/details/9383643
-2. 内核虚拟化kvm/qemu----guest os,kvm,qemu工作流程:http://www.360doc.com/content/12/0619/13/7982302_219186951.shtml
+
+qemu-kvm的初始化与客户系统的执行:
+
+http://blog.csdn.net/lux_veritas/article/details/9383643
+
+内核虚拟化kvm/qemu----guest os,kvm,qemu工作流程:
+
+http://www.360doc.com/content/12/0619/13/7982302_219186951.shtml
  
+
+如何阅读KVM代码
+
+http://blog.csdn.net/xelatex_kvm/article/details/17687021
+
+Qemu创建KVM虚拟机内存初始化流程
+
+http://blog.csdn.net/xelatex_kvm/article/details/17679529
