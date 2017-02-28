@@ -31,7 +31,14 @@
 
 ### 2.2.2 Compile KVM  ###
  
-- Configure the kernel
+- copy config to linux
+	
+	cp [config_for_kvm](/kvm_blog/files/config_for_kvm) .config
+
+
+**we also don't need to check**
+
+- Check the kernel Configure
 	
 	$ make menuconfig
 	choose "Virtualization" and configure as follows
@@ -59,24 +66,14 @@
 		CONFIG_KVM_MMU_AUDIT=y
 
 ### 2.2.3 Complie new kernel and install ###
+	
+a. after installed the kernel, vmlinuz and initrafms are generated under boot directory	or maybe you can use anthor way to build this module. 
 
-		# make vmlinux -j 20 #-j is a parameter
-		# make bzImage -j 20
-		# make modules -j 20 
-		# make modules_install
-		# make install
+		# make -j 32 #-j is a parameter
+		# make modules_install && make install
 
-	a. after installed the kernel, vmlinuz and initrafms are generated under boot directory
-	or maybe you can use anthor way to build this module. 
-
-1). cp /boot/config-4.5.0-rc3 .config 
-2). make allyesconfig -j20 
-3). make modules -j20 
-4). make -20 
-5). make moules_install -j20 
-6). make -install -j20
-
-	b. check /boot/grub/grub.conf, a option of grub is added
+b. check /boot/grub/grub.conf, a option of grub is added
+	
 	menuentry 'Red Hat Enterprise Linux Server (4.5.0-rc4-12695-g0fb00d3) 7.2 (Maipo) with debugging' --class fedora --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulin
 	
 	ux-kvm-advanced-6afe35ac-ecf2-438b-83db-f3da76c2e709' {
@@ -96,7 +93,7 @@
 	
 	}
 
-   Reboot and boot into updated kernel
+c. Reboot and boot into updated kernel
 
 - Build qemu.git  
     `# git clone git://vt-sync/qemu.git qemu.git   ## clone qemu repo under `  
@@ -124,8 +121,8 @@
     $ modprobe kvm  
     $ modprobe kvm_intel  
 
-# 3. 
-## 4.1 Create a guest #
+# 3. Create guest #
+## 3.1 Create a guest #
 	$ qemu-img create -b /share/xvs/img/linux/ia32e_rhel7u2_ga.img -f qcow2 /root/rhel7u2.qcow2  
 	$ qemu-system-x86_64  -m 1024 -smp 4 -net nic,macaddr=xx.xx.xx.xx.xx.xx -net tap,script=/etc/kvm/qemu-ifup -hda /root/rhel7u2.qcow2 -display sdl  
 	when guest is boot up,you can check kvm status in qemu monitor  
@@ -134,18 +131,18 @@
 	if kvm is disable, you must add parameter "-enable-kvm" when you create guest.
 	$ qemu-system-x86_64 -enable-kvm -m 1024 -smp 4 -net nic,macaddr=xx.xx.xx.xx.xx.xx -net tap,script=/etc/kvm/qemu-ifup -hda /root/rhel7u2.qcow2
 
-## 4.2 Create Image
+## 3.2 Create Image
 	$ dd if=/dev/zero of=sles12.img bs=1M count=10240
     or 
 	qemu-img create ...
 	$ qemu-system-x86_64 -m 2048 -smp 4 -boot order=cd -hda sles12.img -cdrom sles12.iso
 	$ qemu-system-x86_64 -m 2048 -smp 4 -hda sles12.img 
 
-## 4.3 安装虚拟机管理工具
+## 3.3 安装虚拟机管理工具
 　　apt-get install virt-manager  
 
-# 5. Problem  #
-## 5.1 No Enough Virtual Disk Space
+# 4. Problem  #
+## 4.1 No Enough Virtual Disk Space
 
 	环境配置：对于sda/vda等格式的硬盘　　
 	OS：centos 6.1　　
@@ -156,7 +153,7 @@
 	/tmpfstmpfs499M 0 499M   0% 
 	/dev/shm　　需要添加硬盘空间。　
 　
-### 5.1.1 添加磁盘 
+### 4.1.1 添加磁盘 
     既然是少一块硬盘，那么我们就直接给虚拟机加一块硬盘就好了，然后直接挂载到根分区的一个目录下面。这样我根分区的硬盘空间就扩展了。　　
     具体步骤：
     A，生成一块新的硬盘，使用virt-manager很容易，直接在虚拟的属性中点击“添加硬件”----“storage”选择多大的空间，驱动类型，缓存模式。然后点击完成。注意，有些硬盘是支持热插拔的，有些不支持。除了IDE格式的硬盘外，其他的都支持热插拔，这就意味着，如果添加的是IDE的硬盘的话，需要对虚拟机进行重启，使他识别新添加的硬盘。
@@ -180,7 +177,7 @@
      $ vim /etc/fstab 
     	添加开机加载，在最后一行加入　　UUID=19fc1d1d-7891-4e22-99ef-ea3e08a61840 /test ext4 defaults1 2　
 
-### 5.1.2 直接拉升分区
+### 4.1.2 直接拉升分区
         
 采用挂载的方法是而外添加了一块盘，有没有一种方法可以直接对硬盘进行拉伸。qemu-img中提供了一个resize的命令，但是该命令只是单纯的简单了拉升或者缩小了一个raw的img镜像大小，对于其中的分区却不能进行修改。我需要对其中的的分区进行拓展。很碰巧红帽子提供这种插件可以时间。此方法是采用红帽子自带的插件virt-resize进行拓展。该命令首先是获取原来的分区信息，还有其他文件信息。然后对新的镜像进行重新分区、格式化。最后拷贝原镜像中的文件到新文件系统中，再用新拓展的镜像替换原有镜像。因为实际采用copy的方式，所以他花的时间比较长，如果是一个大镜像不建议使用此方法，具体解决方案。  
 
