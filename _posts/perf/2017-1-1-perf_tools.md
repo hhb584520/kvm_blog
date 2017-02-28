@@ -140,6 +140,7 @@ Perf 提供了3种用户界面，分别是tui,gtk以及tty。其中可操作性�
 
 (1) 输出格式
 下面演示了 perf stat 针对程序 t1 的输出：
+
 	 $perf stat ./t1 
 	 Performance counter stats for './t1': 
 	
@@ -178,16 +179,17 @@ Run a command and gather performance counter statistics.
     perf stat [-e <EVENT> | --event=EVENT] [-a] - <command> [<options>]
 
 (2) 常用参数
-    -p：stat events on existing process id (comma separated list). 仅分析目标进程及其创建的线程。
-    -a：system-wide collection from all CPUs. 从所有CPU上收集性能数据。
-    -r：repeat command and print average + stddev (max: 100). 重复执行命令求平均。
-    -C：Count only on the list of CPUs provided (comma separated list), 从指定CPU上收集性能数据。
-    -v：be more verbose (show counter open errors, etc), 显示更多性能数据。
-    -n：null run - don't start any counters，只显示任务的执行时间 。
-    -x SEP：指定输出列的分隔符。
-    -o file：指定输出文件，--append指定追加模式。
-    --pre <cmd>：执行目标程序前先执行的程序。
-    --post <cmd>：执行目标程序后再执行的程序。
+
+	-p：stat events on existing process id (comma separated list). 仅分析目标进程及其创建的线程。
+	-a：system-wide collection from all CPUs. 从所有CPU上收集性能数据。
+	-r：repeat command and print average + stddev (max: 100). 重复执行命令求平均。
+	-C：Count only on the list of CPUs provided (comma separated list), 从指定CPU上收集性能数据。
+	-v：be more verbose (show counter open errors, etc), 显示更多性能数据。
+	-n：null run - don't start any counters，只显示任务的执行时间 。
+	-x SEP：指定输出列的分隔符。
+	-o file：指定输出文件，--append指定追加模式。
+	--pre <cmd>：执行目标程序前先执行的程序。
+	--post <cmd>：执行目标程序后再执行的程序。
 
  (3) 使用例子
     执行10次程序，给出标准偏差与期望的比值：
@@ -201,16 +203,19 @@ Run a command and gather performance counter statistics.
     ls命令执行了多少次系统调用：
         # perf stat -e syscalls:sys_enter ls 
 3.4 perf Top
-./perf top -e cpu_clock
 
-      使用 perf stat 的时候，往往您已经有一个调优的目标。比如我刚才写的那个无聊程序 t1。也有些时候，您只是发现系统性能无端下降，并不清楚究竟哪个进程成为了贪吃的 hog。此时需要一个类似 top 的命令，列出所有值得怀疑的进程，从中找到需要进一步审查的家伙。类似法制节目中办案民警常常做的那样，通过查看监控录像从茫茫人海中找到行为古怪的那些人，而不是到大街上抓住每一个人来审问。Perf top 用于实时显示当前系统的性能统计信息。该命令主要用来观察整个系统当前的状态，比如可以通过查看该命令的输出来查看当前系统最耗时的内核函数或某个用户进程。
-      Perf 在采样精度上定义了4个级别：
-      a. 无精度保证
-      b. 采样指令与触发性能事件的 指令之间的偏差为常数(:p)
-      c. 需要尽量保证采样指令与触发性能事件的指令之间的偏差为0(:pp)
-      d. 保证采样指令与触发性能事件的指令之间的偏差必须为0(:ppp)
-      perf top -e cycles:pp
-      让我们再设计一个例子来演示吧。不知道您怎么想，反正我觉得做一件有益的事情很难，但做点儿坏事儿却非常容易。我很快就想到了如代码清单 2 所示的一个程序：
+	./perf top -e cpu_clock
+
+使用 perf stat 的时候，往往您已经有一个调优的目标。比如我刚才写的那个无聊程序 t1。也有些时候，您只是发现系统性能无端下降，并不清楚究竟哪个进程成为了贪吃的 hog。此时需要一个类似 top 的命令，列出所有值得怀疑的进程，从中找到需要进一步审查的家伙。类似法制节目中办案民警常常做的那样，通过查看监控录像从茫茫人海中找到行为古怪的那些人，而不是到大街上抓住每一个人来审问。Perf top 用于实时显示当前系统的性能统计信息。该命令主要用来观察整个系统当前的状态，比如可以通过查看该命令的输出来查看当前系统最耗时的内核函数或某个用户进程。     Perf 在采样精度上定义了4个级别：
+
+a. 无精度保证  
+b. 采样指令与触发性能事件的 指令之间的偏差为常数(:p)  
+c. 需要尽量保证采样指令与触发性能事件的指令之间的偏差为0(:pp)  
+d. 保证采样指令与触发性能事件的指令之间的偏差必须为0(:ppp)  
+      
+	perf top -e cycles:pp
+
+让我们再设计一个例子来演示吧。不知道您怎么想，反正我觉得做一件有益的事情很难，但做点儿坏事儿却非常容易。我很快就想到了如代码清单 2 所示的一个程序：
 
 清单 2. 一个死循环
  while (1) i++;
@@ -316,23 +321,22 @@ Run a command and gather performance counter statistics.
 使用 top 和 stat 之后，您可能已经大致有数了。要进一步分析，便需要一些粒度更细的信息。比如说您已经断定目标程序计算量较大，也许是因为有些代码写的不够精简。那么面对长长的代码文件，究竟哪几行代码需要进一步修改呢？这便需要使用 perf record 记录单个函数级别的统计信息，并使用 perf report 来显示统计结果。您的调优应该将注意力集中到百分比高的热点代码片段上，假如一段代码只占用整个程序运行时间的 0.1%，即使您将其优化到仅剩一条机器指令，恐怕也只能将整体的程序性能提高 0.1%。俗话说，好钢用在刀刃上，不必我多说了。
 
 仍以 t1 为例。
- perf record – e cpu-clock ./t1 
- perf report
-结果如下图所示：
-图 2. perf report 示例
-图 2. perf report 示例
+ 
+	perf record –e cpu-clock ./t1 
+	perf record -r0 -F100000 -g ./t1
+	perf report
+
 不出所料，hot spot 是 longa( ) 函数。
 但，代码是非常复杂难说的，t1 程序中的 foo1() 也是一个潜在的调优对象，为什么要调用 100 次那个无聊的 longa() 函数呢？但我们在上图中无法发现 foo1 和 foo2，更无法了解他们的区别了。
 我曾发现自己写的一个程序居然有近一半的时间花费在 string 类的几个方法上，string 是 C++ 标准，我绝不可能写出比 STL 更好的代码了。因此我只有找到自己程序中过多使用 string 的地方。因此我很需要按照调用关系进行显示的统计信息。
 使用 perf 的 -g 选项便可以得到需要的信息：
- perf record – e cpu-clock – g ./t1 
- perf report
-perf record -F count来指定采样频率
-结果如下图所示：
-图 3. perf – g report 示例
-图 3. perf – g report 示例
-      通过对 calling graph 的分析，能很方便地看到 91% 的时间都花费在 foo1() 函数中，因为它调用了 100 次 longa() 函数，因此假如 longa() 是个无法优化的函数，那么程序员就应该考虑优化 foo1，减少对 longa() 的调用次数。收集采样信息，并将其记录在数据文件中。随后可以通过其它工具(perf-report)对数据文件进行分析，结果类似于perf-top的。
-       运行一个命令去记录它的配置到 perf.data，不显示任何东西，这个文件后面可以使用 perf report来查看
+
+	perf record –e cpu-clock –g ./t1 
+	perf report
+	perf record -F count来指定采样频率
+
+通过对 calling graph 的分析，能很方便地看到 91% 的时间都花费在 foo1() 函数中，因为它调用了 100 次 longa() 函数，因此假如 longa() 是个无法优化的函数，那么程序员就应该考虑优化 foo1，减少对 longa() 的调用次数。收集采样信息，并将其记录在数据文件中。随后可以通过其它工具(perf-report)对数据文件进行分析，结果类似于perf-top的。运行一个命令去记录它的配置到 perf.data，不显示任何东西，这个文件后面可以使用 perf report来查看。
+
 (1) 常用参数
 
 	perf record
