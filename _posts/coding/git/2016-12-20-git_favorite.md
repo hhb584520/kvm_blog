@@ -1,14 +1,31 @@
 # Git 常用命令
 
-# 1 分支 
-## 1.1 本地分支
+你的本地仓库由 git 维护的三棵“树”组成。第一个是你的 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存你的改动；最后是 HEAD，指向你最近一次提交后的结果。
+
+# 0. init
+## 0.1 配置仓库信息
+
+	git config --global user.name "Huang Haibin"
+	git config --global user.email huang.haibin@intel.com
+
+	or add following lines to .git/config: 
+	[user]
+		name = xxx
+		email = xxxx@intel.com
+	Or add following lines to ~/.gitconfig
+	[user]
+		name = xxx
+		email = xxxx@intel.com
+
+# 1. Branch 
+## 1.1 Local Branch
 分支是用来将特性开发绝缘开来的。在你创建仓库的时候，master 是“默认的”。
 
     建立/删除本地分支
     建立：git checkout -b tst_y
     删除：git branch -d tst_y
 
-## 1.2 远端分支
+## 1.2 Remote Branch
 
     a. 创建远端分支
         git push origin <branch_name>
@@ -17,14 +34,14 @@
     c. 检查一下现有的所有分支
         git branch -a
 
-## 1.3 合并分支到主干
+## 1.3 Merge Branch to Master
 
     git checkout master
     git merge hotfix
     在合并改动之前，也可以使用如下命令查看：git diff <source_branch> <target_branch>
 
 
-# 2 Patch
+# 2. Patch
 ## 2.1 查看Patch
 
     git log -p patch_id
@@ -76,7 +93,18 @@
     --subject-prefix="PATCH v7"
     通过 --subject-prefix="PATCH v7"
 
-# 3. Git 创建仓库
+## 2.6 reset commit ##
+
+     git reset --hard commit-number
+     假如你做错事（自然，这是不可能的），你可以使用如下命令替换掉本地改动：
+	 git checkout <filename>
+
+	此命令会使用 HEAD 中的最新内容替换掉你的工作目录中的文件。已添加到缓存区的改动，以及新文件，都不受影响。
+	假如你想要丢弃你所有的本地改动与提交，可以到服务器上获取最新的版本并将你本地主分支指向到它：
+	 git fetch origin
+ 	 git reset --hard origin/master
+
+# 3. repo
 ## 3.1 建立文件夹
 
     mkdir mygit
@@ -90,6 +118,10 @@
 
     git clone ssh://root@vt-nfs/rampup/haibin/githome/mygit
     git push origin master:master
+
+查看远端服务器上的仓库路径  
+
+    git remote -v
 
 ## 3.4 省去每次输入密码
 
@@ -145,60 +177,85 @@ $ git config credential.helper store
 	$ cat ~/.git-credentials
 	https://git-scm.com/book/zh/v2/Git-%E5%B7%A5%E5%85%B7-%E5%87%AD%E8%AF%81%E5%AD%98%E5%82%A8
 
-# 5. Misc
-  a. 查看具体文件修改，可以加 commit 在 log 后面  
+# 5. Log #
+## 5.1 查看某个文件变更情况
+
+	git log -p xen-mceinj.c
+
+## 5.2 查看具体文件修改，可以加 commit 在 log 后面  
 
     git log commit_id -p -1     显示某个commit 的情况，也可以不加 commit_id，显示所有的情况。
     git log --pretty=oneline    只显示一行日志
 
-  b.查看远端服务器上的仓库目录 并 克隆  
 
-    git remote -v
-    git clone git://vt-sync/vmm_tree.git
+# 6. tag
+## 6.1 create tag
 
-  c. 配置仓库信息
+git 创建一个含附注类型的标签非常简单，用 -a （译注：取 annotated 的首字母）指定标签名字即可：
 
-	git config --global user.name "Huang Haibin"
-	git config --global user.email huang.haibin@intel.com
-	or add following lines to .git/config: 
-	[user]
-		name = xxx
-		email = xxxx@intel.com
-	Or add following lines to ~/.gitconfig
-	[user]
-		name = xxx
-		email = xxxx@intel.com
+	$ git tag -a v1.4 -m 'my version 1.4'
 
-  d. reset commit  
+为某次提交后期加 tag
 
-     git reset --hard commit-number
-     假如你做错事（自然，这是不可能的），你可以使用如下命令替换掉本地改动：
-	 git checkout <filename>
+	git tag -a v1.2 9fceb02
 
-	此命令会使用 HEAD 中的最新内容替换掉你的工作目录中的文件。已添加到缓存区的改动，以及新文件，都不受影响。
-	假如你想要丢弃你所有的本地改动与提交，可以到服务器上获取最新的版本并将你本地主分支指向到它：
-	 git fetch origin
- 	 git reset --hard origin/master
 
-  e. 内建的图形化 git：
+## 6.2 show tag
+
+	git tag
+
+## 6.3 checkout to tag
+	
+	git checkout v4.8
+
+## 6.4 delete tag
+
+	git tag -d v1.1
+
+
+## 6.5 分享标签 ##
+默认情况下，git push 并不会把标签传送到远端服务器上，只有通过显式命令才能分享标签到远端仓库。其命令格式如同推送分支，运行 git push origin [tagname] 即可：
+
+	$ git push origin v1.5
+	Counting objects: 50, done.
+	Compressing objects: 100% (38/38), done.
+	Writing objects: 100% (44/44), 4.56 KiB, done.
+	Total 44 (delta 18), reused 8 (delta 1)
+	To git@github.com:schacon/simplegit.git
+	* [new tag]         v1.5 -> v1.5
+
+如果要一次推送所有本地新增的标签上去，可以使用 --tags 选项：
+
+	$ git push origin --tags
+	Counting objects: 50, done.
+	Compressing objects: 100% (38/38), done.
+	Writing objects: 100% (44/44), 4.56 KiB, done.
+	Total 44 (delta 18), reused 8 (delta 1)
+	To git@github.com:schacon/simplegit.git
+	 * [new tag]         v0.1 -> v0.1
+	 * [new tag]         v1.2 -> v1.2
+	 * [new tag]         v1.4 -> v1.4
+	 * [new tag]         v1.4-lw -> v1.4-lw
+	 * [new tag]         v1.5 -> v1.5
+	 * 
+现在，其他人克隆共享仓库或拉取数据同步后，也会看到这些标签。
+
+
+# 7. Misc
+
+## 7.1 图形化
+
+
+- 内建的图形化 git：
 
      gitk
 
-  f. 彩色的 git 输出：
+- 彩色的 git 输出：
 
      git config color.ui true
 
-  g. 标签
 
-     在软件发布时创建标签，是被推荐的。这是个旧有概念，在 SVN 中也有。可以执行如下命令以创建一个叫做 1.0.0 的标签：git tag 1.0.0 1b2e1d63ff 是你想要标记的提交 ID 的前 10 位字符。使用如下命令获取提交 ID：git log
-	 你也可以用该提交 ID 的少一些的前几位，只要它是唯一的。##
-
-# 6. git 基本原理
-你的本地仓库由 git 维护的三棵“树”组成。第一个是你的 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存你的改动；最后是 HEAD，指向你最近一次提交后的结果。
-     
-
-
-# 7. git 官方手册
+# 7.2 git 官方手册
 - GIT 官方wiki 中文版，建立理解并掌握
 
   	http://git-scm.com/book/zh/v2

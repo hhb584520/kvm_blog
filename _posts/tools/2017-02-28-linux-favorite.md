@@ -1,13 +1,13 @@
-## 查看系统是64位还是32位 ##
+## 1. 查看系统是64位还是32位 ##
 1、getconf LONG_BIT or getconf WORD_BIT
 2、file /bin/ls
 3、lsb_release -a
 
-## 查看Linux的内核版本 ##
+## 2. 查看Linux的内核版本 ##
 
 cat /proc/version 
 
-## 查看Linux的发行版 ##
+## 3. 查看Linux的发行版 ##
 登录到服务器执行 lsb_release -a ,即可列出所有版本信息,例如:
    [root@3.5.5Biz-46 ~]# [root@q1test01 ~]# lsb_release -a
    LSB Version:    :core-3.0-amd64:core-3.0-ia32:core-3.0-noarch:graphics-3.0-amd64:graphics-3.0-
@@ -18,7 +18,7 @@ cat /proc/version
    Codename:       NahantUpdate2
    注:这个命令适用于所有的linux，包括Redhat、SuSE、Debian等发行版。
 
-## 安装 自己编译 Driver ##
+## 4. 安装 自己编译 Driver ##
 下面以 sgx driver 为例
 git clone https://github.com/01org/linux-sgx-driver.git
 
@@ -80,13 +80,13 @@ To uninstall the Intel SGX driver, enter the following commands:
 	$ sudo /bin/sed -i '/^isgx$/d' /etc/modules
 
 
-## 提取ISO 文件夹里面的文件
+## 6. 提取ISO 文件夹里面的文件
 
 	mkdir /mnt/iso  
 	mount -o loop *.iso /mnt/iso
 	ls /mnt/iso
 
-## 修改时区和时间
+## 7. 修改时区和时间
 **时区**
 
 查看当前时区
@@ -124,7 +124,7 @@ To uninstall the Intel SGX driver, enter the following commands:
     hwclock -w
 
 
-## 强制 Umount NFS ##
+## 8. 强制 Umount NFS ##
 当Umount一个目录时，提示device is busy，umount加参数f，是强制执行umount，但是许多时候均不会成功。 原理上要想umount，首先要kill正在使用这个目录的进程。假设无法卸载的设备为/dev/sdb1 
 
 1)运行下面命令看一下哪个用户哪个进程占用着此设备  
@@ -146,10 +146,10 @@ Man Umount 查看f和l的参数说明如下：
 -f     Force  unmount.  This  allows  an  NFS-mounted  filesystem  to be unmounted if the NFS server is unreachable. Note: when using umount -f on an NFS filesystem, the filesystem must be mounted using either the soft, or intr options (see nfs(5).  This option  will  not  force  unmount  a  <A1><AE>busy<A1><AF>  filesystem  (use  -l instead). (Requires kernel 2.1.116 or later.)
 -l     Lazy unmount. Detach the filesystem from the filesystem hierarchy now, and cleanup all references to the filesystem as soon as it is not busy anymore. This option allows a <A1><AE>busy<A1><AF> filesystem to be unmounted.  (Requires kernel 2.4.11 or later.) 
 
-## udev 介绍 ##
+## 9. udev 介绍 ##
 http://www.ibm.com/developerworks/cn/linux/l-cn-udev/index.html?ca=drs-cn-0304
 
-## 网卡命名机制 ##
+## 10. 网卡命名机制 ##
 1.传统命名：以太网eth[0,1,2,...],wlan[0,1,2,...]
 2.udev支持多种不同的命名方案：UDEV是系统在用户空间探测内核空间，通过sys接口所输出的硬件设备，并配置的硬件设备的一种应用程序，在centos7上UDEV支持多种不同的命名方案，无非就是支持基于固件的命名（firmware,基于主板上rom芯片）或者是通过总线拓扑（PCI总线）结构来命名。总线拓扑（PCI总线）结构命名主要是根据对应设备所在的位置来命名，slot设备上的第几个接口方式命名，这样命名的方式就是能够实现自动命名，只要接口不坏，无论是哪一块网卡插上去其名称一定是固定的。
 名称组成格式：  
@@ -165,13 +165,13 @@ http://www.ibm.com/developerworks/cn/linux/l-cn-udev/index.html?ca=drs-cn-0304
 - x<MAC>: 基于MAC地址的命名；
 - p<bus>s<slot>:enp2s1
 
-## 常用工具大全--nice ##
+## 11.常用工具大全--nice ##
 
 http://linuxtools-rst.readthedocs.io/zh_CN/latest/index.html  
 
 http://www.computerhope.com/jargon/m/mkdir.htm
 
-## lspci ##
+## 12.lspci ##
 lspci -Dn -s $bdf  
 -D 选项表示在输出信息中显示设备的 domain  
 -n 选项表示用数字的方式显示设备的 vendor ID 和 device ID  
@@ -183,23 +183,24 @@ lspci -k -s $bdf
 lspci -v -s $bdf | grep SR-IOV  
 查看PCI设备是否支持 SR-IOV 功能
 
-## 时间格式 ##
+## 13.时间格式 ##
 
 date -d yesterday +%Y%m%d
 
-## 创建用户 ##
+## 14.创建用户 ##
 
 	useradd -s /bin/sh -g group –G adm,root -d /usr/sam/ -m gem
 
 此命令新建了一个用户gem，该用户的登录Shell是/bin/sh，它属于group用户组，同时又属于adm和root用户组，其中group用户组是其主组。其中-d和-m选项用来为登录名sam产生一个主目录/usr/sam（/usr为默认的用户主目录所在的父目录）。
 
-## 同步时间 ##
+## 15.同步时间 ##
     ntpdate vt-master 
 
-## 统计某个文件夹下面的代码行数 ##
+## 16.统计某个文件夹下面的代码行数 ##
+
 	wc -l `find -name *.c`
 
-## 压缩和解压文件
+## 17.压缩和解压文件
 
 ### 解压 xz 格式文件 ###
 方法一：
@@ -241,8 +242,36 @@ cat op.tar.xz*>op.tar.gz
 ### 如何创建和解压tar.gz文件 ###
     tar zxvf filename.tar.gz
 
-## How to search function header file ##
+## 18.How to search function header file ##
 Please do not use non-standard header files (e.g. malloc.h,linux/fcntl.h). They can cause portability problems, such as what Paul encountered.
    
 If you are not sure which ones are standard, please look at the  man pages of corresponding functions (e.g. man 2 open, man malloc).
 
+## 19.统计一个进程的线程数 ##
+
+### 方法一: /proc ###
+
+proc 伪文件系统，它驻留在 /proc 目录，这是最简单的方法来查看任何活动进程的线程数。 /proc 目录以可读文本文件形式输出，提供现有进程和系统硬件相关的信息如 CPU、中断、内存、磁盘等等.
+
+	$ cat /proc/<pid>/status
+
+上面的命令将显示进程 <pid> 的详细信息，包括过程状态（例如, sleeping, running)，父进程 PID，UID，GID，使用的文件描述符的数量，以及上下文切换的数量。输出也包括进程创建的总线程数如下所示。
+
+	Threads: <N>
+
+例如，检查 PID 20571进程的线程数：
+
+	$ cat /proc/20571/status
+
+或者，你可以在 /proc//task 中简单的统计子目录的数量，如下所示。
+
+	$ ls /proc/<pid>/task | wc
+
+这是因为，对于一个进程中创建的每个线程，在 /proc/<pid>/task 中会创建一个相应的目录，命名为其线程 ID。由此在/proc/<pid>/task 中目录的总数表示在进程中线程的数目。
+
+
+### 方法二: ps ###
+
+如果你是功能强大的 ps 命令的忠实用户，这个命令也可以告诉你一个进程（用“H”选项）的线程数。下面的命令将输出进程的线程数。“h”选项需要放在前面。
+
+	$ ps hH p <pid> | wc -l

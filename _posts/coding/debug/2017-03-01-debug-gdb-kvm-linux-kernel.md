@@ -73,3 +73,88 @@ oops 显示发生错误时处理器的状态，包括 CPU 寄存器的内容、�
 	reboot
 
 ## 2.2 创建支持 gdb 调试的 KVM 虚拟机 ##
+本节介绍如何在 Linux RedHat/CentOS 上创建 KVM 虚拟机，并配置虚机使其运行 gdbserver 以支持 gdb 调试。
+如果 KVM 没有安装，首先安装 KVM 及相关软件。安装步骤如下：
+KVM 需要有 CPU 的支持（Intel vmx 或 AMD svm），在安装 KVM 之前检查一下 CPU 是否提供了虚拟技术的支持：
+[root@myKVM ~]# egrep '^flags.*(vmx|svm)' /proc/cpuinfo
+若有显示，则说明处理器具有 VT 功能。
+在主板 BIOS 中开启 CPU 的 Virtual Technolege(VT，虚化技术 )；
+安装 kvm 及其需要的软件包。
+
+
+	[root@myKVM ~]# yum groupinstall KVM
+
+检查 kvm 模块是否安装，使用以下命令显示两个模块则表示安装完成：
+
+	[root@myKVM ~]# lsmod | grep kvm 
+	 kvm_intel              52570  0 
+	 kvm                   314739  1 kvm_intel
+
+启动 virt-manager 管理界面。
+客户端：使用 VNC 连接到服务器端，因为需要用服务器的图形界面。
+服务器端：启动 libvirtd 服务，并保证下次自动启动：
+
+	[root@myKVM ~]# service libvirtd start 
+	 Starting libvirtd daemon:                                  [ 确定 ] 
+	[root@myKVM ~]# chkconfig libvirtd on
+
+接下来远程创建和管理 KVM 虚拟机。打开 Application -> System Tools -> Virtual Machine Manager 就可以装虚拟机了，功能跟 VMware 类似。
+相关的命令有 virt-manager 和 virsh。
+使用“virsh list”可以查看虚拟机是否已经创建，然后通过“virsh edit <vm_name>”可以修改 VM 配置。
+根据本文的测试结果，domain type 必须改为 .../qemu/1.0 才能支持 gdb 调试。
+
+	<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+
+然后添加下面的配置使得虚拟机支持 gdb 调试：
+
+	<qemu:commandline> 
+	    <qemu:arg value='-S'/> 
+	    <qemu:arg value='-gdb'/> 
+	    <qemu:arg value='tcp::1234'/> 
+	 </qemu:commandline>
+
+如果创建好的虚拟机不能访问，可以使用 ping, brctl show, ps 等命令进行诊断，不再一一详述。
+
+## 2.3 使用 gdb 调试 KVM 虚拟机的内核与模块 ##
+本节介绍如何调试 KVM 虚拟机内核和模块。并说明在调试过程中如何加载模块并链接符号表。
+首先将虚拟机更新至编译好的内核。可将 vmlinux , System.map, initramfs, /lib/modules/<kernel version> 这些文件拷贝至虚拟机，或者在虚拟机上重新编译内核。
+然后在主机端创建一个目录，拷贝 vmlinux 文件并进入 gdb 调试：
+
+	gdb vmlinux-3.18.2
+
+连接虚拟机：
+	target remote 127.0.0.1:1234
+
+此时虚拟机已经被中断。
+下面在 load_module 添加断点并继续执行。
+
+在虚拟机上插入需要调试的模块：
+
+	insmod nzuta.ko
+
+在宿主机上找到调用 do_init_module 的地方，添加断点并执行到此处。
+
+下面是关键的部分。
+打印 text section，data section 和 bss section 的名称和地址：
+
+	print mod->sect_attrs->attrs[1]->name 
+	print mod->sect_attrs->attrs[7]->name 
+	print mod->sect_attrs->attrs[9]->name 
+	print /x mod->sect_attrs->attrs[1]->address 
+	print /x mod->sect_attrs->attrs[7]->address 
+	print /x mod->sect_attrs->attrs[9]->address
+
+根据上面打印的地址导入编译好的内核模块（注意编译此模块需要使用与虚拟机相同的内核源码编译，也需要使用 -O1 选项）：
+
+	add-symbol-file /home/dawei/nzuta/nzuta.ko <text addr> -s .data <data addr> -s .bss 
+ 		<bss addr>
+
+
+下面就可以在模块代码中添加断点并单步调试了：
+
+如果要退出 gdb，需要先使用 delete 命令清理所有断点，并 detach。
+
+
+# 参考资料 #
+
+内核调试神器SystemTap

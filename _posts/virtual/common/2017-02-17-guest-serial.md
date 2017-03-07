@@ -43,3 +43,53 @@
 
 
 # 2. Xen Serial #
+
+## 2.1 修改 guest ##
+
+	menuentry 'Ubuntu' --class ubuntu --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-cf0213f3-0be3-4074-8e8c-00e0ff164e34' {
+	        recordfail
+	        load_video
+	        gfxmode $linux_gfx_mode
+	        insmod gzio
+	        insmod part_msdos
+	        insmod ext2
+	        set root='hd0,msdos1'
+	        if [ x$feature_platform_search_hint = xy ]; then
+	          search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos1 --hint-efi=hd0,msdos1 --hint-baremetal=ahci0,msdos1  cf0213f3-0be3-4074-8e8c-00e0ff164e34
+	        else
+	          search --no-floppy --fs-uuid --set=root cf0213f3-0be3-4074-8e8c-00e0ff164e34
+	        fi
+	        linux   /boot/vmlinuz-4.2.0-27-generic root=UUID=cf0213f3-0be3-4074-8e8c-00e0ff164e34 ro console=tty0 console=ttyS0,115200,8n1 3 splash $vt_handoff
+	        initrd  /boot/initrd.img-4.2.0-27-generic
+	}
+
+添加下面参数
+
+	console=tty0 console=ttyS0,115200,8n1 3
+
+## 2.2 创建虚拟机 ##
+
+	[root@l1xen haibin]# cat config.test
+	builder = "hvm"
+	
+	name = "lmce"
+	vcpus = 2
+	memory = 1024
+	disk = [ '/dev/sdb, raw, xvda, rw' ]
+	cpus = [ '2', '3' ]
+	device_model_override = '/usr/local/lib/xen/bin/qemu-system-i386'
+	device_model_version = 'qemu-xen'
+	sdl = 0
+	vnc = 1
+	vnclisten = '0.0.0.0'
+	stdvga = 1
+	hap = 1
+	hpet = 1
+	serial = 'pty'
+	on_crash = 'preserve'
+	lmce = 1
+
+
+## 2.3 连接串口 ##
+
+	xl console domid
