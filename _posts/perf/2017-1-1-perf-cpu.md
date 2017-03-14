@@ -1,5 +1,42 @@
-# 1 概念 #
+# 1. CPU性能测试 #
+## 1.1 Super_PI ##
+https://zh.wikipedia.org/wiki/Super_PI
 
+http://superpi.ilbello.com/pi/super_pi.tar.bz2
+
+Super PI被许多超频玩家用以测试电脑的性能及稳定性。在超频社区中，常规的程序为电脑爱好者提供基准测试以比较圆周率计算“世界纪录”并展示超频能力。该程序也被用来测定某一超频速率下的稳定性。如果一台电脑能够准确计算圆周率至小数点以后3200万位，就被认为在一定的RAM和CPU环境下具有稳定性。然而，其它CPU/RAM增强运算程序运行时间往往持续几个小时而不是几分钟并且可能会给系统稳定性带来更多压力。尽管Super PI并非计算圆周率最快的程序，但它仍在硬件及超频社区中广为流传。
+
+Super PI采用单线程，因此其作为目前多核心处理器性能指标的测试工具的意义迅速降低。因此，Hyper PI被开发出来以支持多线程Super PI同时运行而能在多核心设备测试稳定性。其他的多线程程序有：wPrime、IntelBurnTest、Prime95、Montecarlo superPI、OCCT。
+
+# 2. CPU 性能优化 #
+## 2.1 中断亲和性
+
+不同的设备一般都有自己的IRQ号码（当然一个设备还有可能有多个IRQ号码）
+
+通过如下命令可查看：
+如：cat /proc/interrupts | grep -e “CPU\|eth4”
+
+中断的smp affinity在cat  /proc/irq/$Num/smp_affinity，可以 echo “$bitmask” > /proc/irq/$num/smp_affinity来改变它的值。
+
+注意smp_affinity这个值是一个十六进制的bitmask，它和cpu No.序列的“与”运算结果就是将affinity设置在那个（那些）CPU了。（也即smp_affinity中被设置为1的位为CPU No.）
+
+比如：我有8个逻辑core，那么CPU#的序列为11111111 （从右到左依次为#0~#7的CPU）
+
+如果cat  /proc/irq/84/smp_affinity的值为：20（二进制为：00100000），则84这个IRQ的亲和性为#5号CPU。
+
+每个IRQ的默认的smp affinity在这里：cat /proc/irq/default_smp_affinity
+
+另外，cat  /proc/irq/$Num/smp_affinity_list 得到的即是CPU的一个List。
+
+默认情况下，有一个irqbalance在对IRQ进行负载均衡，它是/etc/init.d/irqbalance
+在某些特殊场景下，可以根据需要停止这个daemon进程。
+
+## 2.2 设置 CPU的亲和性 ##
+如果要想提高性能，将IRQ绑定到某个CPU，那么最好在系统启动时，将那个CPU隔离起来，不被scheduler通常的调度。
+
+可以通过在Linux kernel中加入启动参数：isolcpus=cpu-list来将一些CPU隔离起来。
+
+### 2.2.1 概念
 什么是CPU Affinity？Affinity是进程的一个属性，这个属性指明了进程调度器能够把这个进程调度到哪些CPU上。
 在Linux中，我们可以利用CPU affinity 把一个或多个进程绑定到一个或多个CPU上。CPU Affinity分为2种，soft affinity和hard affinity。soft affinity仅是一个建议，如果不可避免，调度器还是会把进程调度到其它的CPU上。hard affinity是调度器必须遵守的规则。
 
@@ -17,14 +54,14 @@ CPU之间是不共享缓存的，如果进程频繁的在各个CPU间进行切�
 
  在real-time或time-sensitive应用中，我们可以把系统进程绑定到某些CPU上，把应用进程绑定到剩余的CPU上。典型的设置是，把应用绑定到某个CPU上，把其它所有的进程绑定到其它的CPU上。
 
-# 2 绑定进程和CPU的编码实现 #
+### 2.2.2 绑定进程和CPU的编码实现 ###
 进程亲和性的设置和获取主要通过下面两个函数来实现：
 
 	#define _GNU_SOURCE
 	#include <sched.h>long sched_setaffinity(pid_t pid, unsigned int len,unsigned long *user_mask_ptr);
 	long sched_getaffinity(pid_t pid, unsigned int len,unsigned long *user_mask_ptr);
 
-# 3 绑定线程和CPU的编码实现 #
+### 2.2.3 绑定线程和CPU的编码实现 ###
 与进程的情况相似，线程亲和性的设置和获取主要通过下面两个函数来实现：
 
 	int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize，const cpu_set_t *cpuset);
@@ -39,7 +76,7 @@ CPU之间是不共享缓存的，如果进程频繁的在各个CPU间进行切�
     
 cpu集可以认为是一个掩码，每个设置的位都对应一个可以合法调度的 cpu，而未设置的位则对应一个不可调度的 CPU。换而言之，线程都被绑定了，只能在那些对应位被设置了的处理器上运行。通常，掩码中的所有位都被置位了，也就是可以在所有的cpu中调度。
 
-# 4 进程独占CPU #
+### 2.2.4 进程独占CPU ###
 
 如何实现一个或多个进程独占一个或多个CPU？ 即调度器只能把指定的进程调度至指定的CPU。最简单的方法是利用fork()的继承特性，子进程继承父进程的affinity。这种方法无需修改和编译内核代码。
 
@@ -50,8 +87,8 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 /bin/bind 1 1   #绑定init进程至处理器0
 /bin/bind $$ 1  #绑定当前进程至处理器0
 
-# 5 源代码 #
-## 5.1 绑定进程 ##
+### 2.2.5 源代码 ###
+#### 5.1 绑定进程 ####
 	/* bind - simple command-line tool to set CPU * affinity of a given task */#define _GNU_SOURCE 
 	#include <stdlib.h>
 	#include <stdio.h>
@@ -86,7 +123,7 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 	     return 0;
 	 }
 
-## 5.2 绑定线程 ##
+#### 5.2 绑定线程 ####
 
 	#define _GNU_SOURCE
 	#include <stdio.h>
@@ -138,3 +175,12 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 	         pthread_join(tid, NULL);  
 	         return 0;
 	}
+
+# 3. 参考资料 #
+
+http://kernel.org/doc/Documentation/IRQ-affinity.txt
+
+http://kernel.org/doc/Documentation/kernel-parameters.txt
+
+http://www.vpsee.com/2010/07/load-balancing-with-irq-smp-affinity/
+

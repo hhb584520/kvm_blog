@@ -1,5 +1,7 @@
 # 1. Config Hardware #
 
+http://www.thomas-krenn.com/en/wiki/Activating_the_Intel_VT_Virtualization_Feature
+
 ## 1.1 Open VT-x and VT-d 
 
 	Intel(R) Virtualization Technology

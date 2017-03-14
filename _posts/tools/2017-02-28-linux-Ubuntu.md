@@ -446,3 +446,31 @@ nfs目录
 	/home/work	 127.0.0.1 (rw,sync,no_root_squash)
 	 1694  /etc/init.d/nfs-kernel-server start
 	 1695  mount -t nfs 127.0.0.1:/home/work /var/lib/nova/instances/
+
+# 10. 网络配置 #
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+        address 115.238.105.214
+        netmask 255.255.255.248
+        network 115.238.105.208
+        broadcast 115.238.105.215
+        gateway 115.238.105.209
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-nameservers 202.101.172.25
+
+auto eth2
+iface eth2 inet manual
+
+auto br0
+iface br0 inet static
+        bridge_ports eth2
+        address 12.0.0.200
+        netmask 255.255.255.0
+        network 12.0.0.0
+        broadcast 12.0.0.255
+        gateway 12.0.0.1
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-nameservers 12.0.0.1

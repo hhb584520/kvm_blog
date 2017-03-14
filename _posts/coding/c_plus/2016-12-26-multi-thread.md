@@ -190,3 +190,53 @@ thread.c为你些的源文件，不要忘了加上头文件#include
 Project->Properties->C/C++ Build->Settings->GCC C++ Linker->Libraries
 在Libraries(-l)中添加pthread即可
 在Libraries search path(-L)中添加crypto即可
+
+
+# 3. 线程相关操作 #
+
+## 3.1 线程相关操作 ##
+
+### pthread_t ###
+
+pthread_t在头文件/usr/include/bits/pthreadtypes.h中定义：
+　　typedef unsigned long int pthread_t;
+　　它是一个线程的标识符。
+
+### pthread_create ###
+
+函数pthread_create用来创建一个线程，它的原型为：
+
+	　extern int pthread_create __P ((pthread_t *__thread, __const pthread_attr_t *__attr,
+	　void *(*__start_routine) (void *), void *__arg));
+
+第一个参数为指向线程标识符的指针，第二个参数用来设置线程属性，第三个参数是线程运行函数的起始地址，最后一个参数是运行函数的参数。这里，我们的函数thread不需要参数，所以最后一个参数设为空指针。第二个参数我们也设为空指针，这样将生成默认属性的线程。对线程属性的设定和修改我们将在下一节阐述。当创建线程成功时，函数返回0，若不为0则说明创建线程失败，常见的错误返回代码为EAGAIN和EINVAL。前者表示系统限制创建新的线程，例如线程数目过多了；后者表示第二个参数代表的线程属性值非法。创建线程成功后，新创建的线程则运行参数三和参数四确定的函数，原来的线程则继续运行下一行代码。
+
+### pthread_join pthread_exit ###
+　　
+函数pthread_join用来等待一个线程的结束。函数原型为：
+
+	extern int pthread_join __P ((pthread_t __th, void **__thread_return));
+　　
+第一个参数为被等待的线程标识符，第二个参数为一个用户定义的指针，它可以用来存储被等待线程的返回值。这个函数是一个线程阻塞的函数，调用它的函数将一直等待到被等待的线程结束为止，当函数返回时，被等待线程的资源被收回。一个线程的结束有两种途径，一种是象我们上面的例子一样，函数结束了，调用它的线程也就结束了；另一种方式是通过函数pthread_exit来实现。它的函数原型为：
+
+	extern void pthread_exit __P ((void *__retval)) __attribute__ ((__noreturn__));
+
+　　
+唯一的参数是函数的返回代码，只要pthread_join中的第二个参数thread_return不是NULL，这个值将被传递给 thread_return。最后要说明的是，一个线程不能被多个线程等待，否则第一个接收到信号的线程成功返回，其余调用pthread_join的线程则返回错误代码ESRCH。在这一节里，我们编写了一个最简单的线程，并掌握了最常用的三个函数pthread_create，pthread_join和pthread_exit。下面，我们来了解线程的一些常用属性以及如何设置这些属性。
+
+
+## 3.2 互斥锁相关 ##
+
+互斥锁用来保证一段时间内只有一个线程在执行一段代码。
+
+### pthread_mutex_init ###
+
+函数pthread_mutex_init用来生成一个互斥锁。NULL参数表明使用默认属性。如果需要声明特定属性的互斥锁，须调用函数 pthread_mutexattr_init。函数pthread_mutexattr_setpshared和函数 pthread_mutexattr_settype用来设置互斥锁属性。前一个函数设置属性pshared，它有两个取值， PTHREAD_PROCESS_PRIVATE和PTHREAD_PROCESS_SHARED。前者用来不同进程中的线程同步，后者用于同步本进程的不同线程。在上面的例子中，我们使用的是默认属性PTHREAD_PROCESS_ PRIVATE。后者用来设置互斥锁类型，可选的类型有PTHREAD_MUTEX_NORMAL、PTHREAD_MUTEX_ERRORCHECK、 PTHREAD_MUTEX_RECURSIVE和PTHREAD _MUTEX_DEFAULT。它们分别定义了不同的上所、解锁机制，一般情况下，选用最后一个默认属性。
+
+### pthread_mutex_lock pthread_mutex_unlock pthread_delay_np  ###
+
+pthread_mutex_lock声明开始用互斥锁上锁，此后的代码直至调用pthread_mutex_unlock为止，均被上锁，即同一时间只能被一个线程调用执行。当一个线程执行到pthread_mutex_lock处时，如果该锁此时被另一个线程使用，那此线程被阻塞，即程序将等待到另一个线程释放此互斥锁。
+
+
+# 参考资料 #
+http://zhuwenlong.blog.51cto.com/209020/40339
