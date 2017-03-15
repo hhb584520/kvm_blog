@@ -39,3 +39,12 @@ $ git rebase --continue
 
 $ git rebase --abort
 gitcast:c7-rebase
+
+
+## master 错误提交合并如 staging分支 ##
+
+	git checkout staging
+	git rebase master
+	git push origin staging:staging
+	git chekout master
+	git merge master
