@@ -1,4 +1,4 @@
-# Ubunt 使用 #
+# Redhat 使用 #
 
 ## 1.redhat update ## 
 ### 1.1 配置 /etc/yum.repo.d/ 源 ###
