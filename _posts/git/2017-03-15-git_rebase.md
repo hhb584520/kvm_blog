@@ -43,8 +43,11 @@ gitcast:c7-rebase
 
 ## master 错误提交合并如 staging分支 ##
 
+	#!/bin/sh
+	cd /haibin/staging
 	git checkout staging
-	git rebase master
-	git push origin staging:staging
-	git chekout master
-	git merge master
+	git pull
+	git checkout master
+	git pull
+	git merge staging master
+	git push
