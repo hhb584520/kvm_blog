@@ -469,3 +469,7 @@ virtio_blk驱动使用Virtio API为客户机的提供了一个高效访问块设
 另外，Intel 的一些较新的硬件还向时钟提供了更高级的硬件支持，即 TSC Deadline Timer，TSC deadline 模式不是使用CPU外部总线的频率去定时减少计数器的值，而是软件设置了最后期限的阈值，当CPU的时间戳计数器的值大于或等于这个“deadline"时，本地的高级可编程中断控制器（LAPIC）就产生一个时钟中断请求。正是由于这个特点，它可以 提供更精准的时间，也可以更容易避免或处理竞态条件 。
     
 KVM模块对于 TSC Deadline Timer的支持开始于 Linux 3.6 版本，QEMU对于TSC Deadline Timer的支持开始于 qemu-kvm 0.12 版本。而且在启动客户机时，在 qemu-kvm 命令行使用“-cpu host" 参数才能将这个特性传递给客户机，使其可以使用 TSC Deadline Timer。
+
+
+# 参考资料 #
+http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.pdf
