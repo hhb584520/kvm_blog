@@ -1,17 +1,21 @@
 # 其它配置 #
 ## 1. xl 和 qemu-system-x86_64 的帮助
 
-**XL**
+### 1.1 XL ###
 
 	1. 下载Xen的源码
 	2. 执行编译命令
 	   make docs && make install-docs
 	3. 查看xl 配置文件的参数 man xl.cfg
 
-**Qemu-system-x86_64 **      
+	https://xenbits.xen.org/docs/unstable/man/xl.cfg.5.html
+
+### 1.2 Qemu-system-x86_64 ###
     
 	qemu-system-x86_64 --help
     qemu-system-x86_64 -cpu help 
+
+	https://wiki.archlinux.org/index.php/QEMU_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
  
 ## 2. 鼠标飘移问题
     Xen: 配置文件添加如下两项

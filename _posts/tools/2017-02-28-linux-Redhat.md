@@ -88,3 +88,10 @@ http://www.bkjia.com/Linuxjc/994106.html
 	 33     exit 0
 	 34 fi
 	 35
+
+## 4.Install redhat ##
+
+### 4.1 Install with GUI ###
+
+
+### 4.2 Install without GUI ###
