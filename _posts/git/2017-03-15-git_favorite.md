@@ -187,6 +187,11 @@ $ git config credential.helper store
     git log commit_id -p -1     显示某个commit 的情况，也可以不加 commit_id，显示所有的情况。
     git log --pretty=oneline    只显示一行日志
 
+## 5.3 按照字符查找日志
+	
+	git log --grep="4FMAPS" -i
+
+	-i 不区分大小写
 
 # 6. tag
 ## 6.1 create tag

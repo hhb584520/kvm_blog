@@ -37,6 +37,11 @@ http://www.thomas-krenn.com/en/wiki/Activating_the_Intel_VT_Virtualization_Featu
 	
 	cp [config_for_kvm](/kvm_blog/files/config_for_kvm) .config
 
+comments:
+ if you debug, you want just compile kvm.ko and kvm_intel.ko
+
+	make -j8 -C `pwd` M=`pwd`/arch/x86/kvm modules
+	http://www.10tiao.com/html/625/201702/2652501984/1.html
 
 **we also don't need to check**
 
