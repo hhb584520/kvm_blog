@@ -110,23 +110,26 @@ c. Reboot and boot into updated kernel
     `# git branch`
 
 - you can checkout to uq/master tree
-    `# git checkout uq/master`
+    
+	`# git checkout uq/master`
     
 - then compile the qemu  
-    $ ./configure --target-list=x86_64-softmmu  
-    $ ./configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --disable-gtk --disable-sdl # -display sdl
-    Comments: Ctrl+Alt+2 --> info kvm 查看是否编译时候使用了 --enable-kvm  
-    $ make   
-    $ make install  
+    
+		$ ./configure --target-list=x86_64-softmmu  
+	    $ ./configure --target-list=x86_64-softmmu --enable-kvm --enable-vnc --disable-gtk --disable-sdl # -display sdl
+	    Comments: Ctrl+Alt+2 --> info kvm 查看是否编译时候使用了 --enable-kvm  
+	    $ make   
+	    $ make install  
    
 
 -  after qemu is installed, check kvm module
-    $ lsmod | grep kvm  
-    	kvm_intel 128177  0   
-    	kvm   413542  1 kvm_intel  
-    	If KVM modules is not loaded, load the modules manually  
-    $ modprobe kvm  
-    $ modprobe kvm_intel  
+    
+		$ lsmod | grep kvm  
+	    	kvm_intel 128177  0   
+	    	kvm   413542  1 kvm_intel  
+	    	If KVM modules is not loaded, load the modules manually  
+	    $ modprobe kvm  
+	    $ modprobe kvm_intel  
 
 # 3. Create guest #
 ## 3.1 Create a guest #
