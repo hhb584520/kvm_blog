@@ -3,7 +3,11 @@
 你的本地仓库由 git 维护的三棵“树”组成。第一个是你的 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存你的改动；最后是 HEAD，指向你最近一次提交后的结果。
 
 # 0. init
-## 0.1 配置仓库信息
+## 0.1 install git
+	
+	# yum install git-all 
+
+## 0.2 配置仓库信息
 
 	git config --global user.name "Huang Haibin"
 	git config --global user.email huang.haibin@intel.com
