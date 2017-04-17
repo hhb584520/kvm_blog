@@ -75,7 +75,8 @@ comments:
 ### 2.2.3 Complie new kernel and install ###
 	
 a. after installed the kernel, vmlinuz and initrafms are generated under boot directory	or maybe you can use anthor way to build this module. 
-
+		
+		# make olddefconfig
 		# make -j 32 #-j is a parameter
 		# make modules_install && make install
 
