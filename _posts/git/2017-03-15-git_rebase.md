@@ -47,7 +47,13 @@ gitcast:c7-rebase
 	cd /haibin/staging
 	git checkout staging
 	git pull
+	
 	git checkout master
 	git pull
+	
+	git checkout staging
+	git rebase master staging
+
+	git checkout master
 	git merge staging master
 	git push

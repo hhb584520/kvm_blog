@@ -8,6 +8,30 @@ Super PI被许多超频玩家用以测试电脑的性能及稳定性。在超频
 
 Super PI采用单线程，因此其作为目前多核心处理器性能指标的测试工具的意义迅速降低。因此，Hyper PI被开发出来以支持多线程Super PI同时运行而能在多核心设备测试稳定性。其他的多线程程序有：wPrime、IntelBurnTest、Prime95、Montecarlo superPI、OCCT。
 
+## 1.2 Spec cpu
+
+https://www.spec.org/benchmarks.html#cpu
+
+## 1.3 Sysbench
+
+http://imysql.com/2014/10/17/sysbench-full-user-manual.shtml
+
+sysbench是一个模块化的、跨平台、多线程基准测试工具，主要用于评估测试各种不同系统参数下的数据库负载情况。
+目前sysbench代码托管在launchpad上，项目地址：https://launchpad.net/sysbench（原来的官网 http://sysbench.sourceforge.net 已经不可用），源码采用bazaar管理。
+
+sysbench支持以下几种测试模式：
+
+- CPU运算性能
+- 磁盘IO性能
+- 调度程序性能
+- 内存分配及传输速度
+- POSIX线程性能
+- 数据库性能(OLTP基准测试)
+目前sysbench主要支持 mysql,drizzle,pgsql,oracle 等几种数据库。
+
+## 1.4 cyclesoak
+http://www.stlinux.com/devel/traceprofile/cyclesoak
+
 # 2. CPU 性能优化 #
 ## 2.1 中断亲和性
 

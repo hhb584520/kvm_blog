@@ -1,4 +1,13 @@
-## intel dpdk ##
+# 1. 性能评测
+Linux环境下网络性能测试: http://www.samirchen.com/linux-network-performance-test/
+## 1.1 netperf
+
+https://www.ibm.com/developerworks/cn/linux/l-netperf/
+
+## 1.2 iperf
+
+# 2. 性能优化
+## 2.1 intel dpdk ##
 
 数据包绕过内核，透传给用户层，能大大提高虚拟机的网络性能，比SR-IOV好很多倍
  
@@ -9,12 +18,12 @@ vmdq
 SR_IOV
 
 
-## 提高 Linux 上 socket 性能 ##
+## 2.2 提高 Linux 上 socket 性能 ##
 
 https://www.ibm.com/developerworks/cn/linux/l-hisock.html
 
 
-## Nagle算法 ##
+## 2.3 Nagle算法 ##
 
 改算法是以減少封包传送量來增进TCP/IP网络的效能
 
@@ -30,7 +39,7 @@ https://www.ibm.com/developerworks/cn/linux/l-hisock.html
 https://en.wikipedia.org/wiki/Nagle's_algorithm
 
 
-## Linux下TCP/IP及内核参数优化 ##
+## 2.4 Linux下TCP/IP及内核参数优化 ##
 Linux下TCP/IP及内核参数优化有多种方式，参数配置得当可以大大提高系统的性能，也可以根据特定场景进行专门的优化，如TIME_WAIT过高，DDOS攻击等等。
 如下配置是写在sysctl.conf中，可使用sysctl -p生效，文中附带了一些默认值和中文解释（从网上收集和翻译而来），确有些辛苦，转载请保留链接，谢谢～。
 相关参数仅供参考，具体数值还需要根据机器性能，应用场景等实际情况来做更细微调整。

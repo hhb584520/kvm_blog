@@ -246,7 +246,8 @@ FYI:	man 7 gitglossary
 		A git repo without working tree or INDEX, only metadata.
 		If a repo is to be shared by multiple users, it should be bare.
 
-
+		git init --bare
+		git clone --bare
 
 
 	To illustrate:
