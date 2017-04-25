@@ -89,9 +89,18 @@ http://www.bkjia.com/Linuxjc/994106.html
 	 34 fi
 	 35
 
-## 4.Install redhat ##
+## 4. Install software
 
-### 4.1 Install with GUI ###
+### 4.1 wine install #
+
+http://www.tecmint.com/install-wine-in-rhel-centos-and-fedora/
+
+### 4.2 redhat ##
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/pdf/System_Administrators_Guide/Red_Hat_Enterprise_Linux-7-System_Administrators_Guide-en-US.pdf 
+
+## 5.Install redhat ##
+
+### 5.1 Install with GUI ###
 
 
-### 4.2 Install without GUI ###
+### 5.2 Install without GUI ###
