@@ -877,6 +877,11 @@ Makefile文件：
 
 http://www.spongeliu.com/165.html
 
+# 11.How to search function header file ##
+Please do not use non-standard header files (e.g. malloc.h,linux/fcntl.h). They can cause portability problems, such as what Paul encountered.
+   
+If you are not sure which ones are standard, please look at the  man pages of corresponding functions (e.g. man 2 open, man malloc).
+
 # 参考资料 #
 
 缺页处理  

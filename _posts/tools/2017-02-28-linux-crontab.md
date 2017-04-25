@@ -1,6 +1,6 @@
 # crontab #
 
-## 经典例子 ##
+## 1. 经典例子 ##
 
     /sbin/service crond restart
     crontab -e
@@ -70,11 +70,11 @@
 
 “/dev/null 2>&1”表示先将标准输出重定向到/dev/null，然后将标准错误重定向到标准输出，由于标准输出已经重定向到了/dev/null，因此标准错误也会重定向到/dev/null，这样日志输出问题就解决了。
 
-## 命令格式 ##
+## 2. 命令格式 ##
 
     `crontab [-u user] file crontab [-u user] [ -e | -l | -r ]`
 
-## 命令参数 ##
+## 3. 命令参数 ##
 
     -u user：用来设定某个用户的crontab服务；
     file：file是命令文件的名字,表示将file做为crontab的任务列表文件并载入crontab。
@@ -84,7 +84,7 @@
     -r：从/var/spool/cron目录中删除某个用户的crontab文件，如果不指定用户，则默认删除当前用户的crontab文件。
     -i：在删除用户的crontab文件时给确认提示。
 
-## crontab的文件格式 ##
+## 4. crontab的文件格式 ##
 分 时 日 月 星期 要运行的命令
 
 - 第1列分钟1～59
@@ -94,7 +94,7 @@
 - 第5列星期0～7（0和7表示星期天）
 - 第6列要运行的命令
 
-## 常用方法 ##
+## 5. 常用方法 ##
 创建一个新的crontab文件
 
 向cron进程提交一个crontab文件之前，首先要设置环境变量EDITOR。cron进程根据它来确定使用哪个编辑器编辑crontab文件。99%的UNIX和LINUX用户都使用vi，如果你也是这样，那么你就编辑$HOME目录下的. profile文件，在其中加入这样一行:
@@ -113,9 +113,9 @@ EDITOR=vi; export EDITOR
 
 	$ crontab davecron
 
-现在该文件已经提交给cron进程，它将每隔1 5分钟运行一次。同时，新创建文件的一个副本已经被放在/var/spool/cron目录中，文件名就是用户名(即dave)。
+现在该文件已经提交给cron进程，它将每隔15分钟运行一次。同时，新创建文件的一个副本已经被放在/var/spool/cron目录中，文件名就是用户名(即dave)。
 
-## 常用命令 ##
+## 6. 常用命令 ##
 - 使用-l参数列出crontab文件:
 
 	$ crontab -l
@@ -137,9 +137,8 @@ EDITOR=vi; export EDITOR
 
     $crontab -r
 
-
-## 注意事项 ##
-### crontab 没有立即生效的原因
+## 7. 注意事项 ##
+### 7.1 crontab 没有立即生效的原因
 第一种是脚本执行了，但是报错：在crontab里调度运行，结果发现没有结果，查看/var/log/message 日志，发现crontab有执行，但是失败。
 手动运行都是可以的，放在crontab里边发现就不能运行了。
 处理方法：脚本中不要采用相对路径，全部改为绝对路径
@@ -154,7 +153,7 @@ use the following command add entries to crontab should take effect right away.
 如还不行就从其服务：
 处理方法：/etc/init.d/crond restart   
 
-### 新创建 cron job 没有马上执行 ## 
+### 7.2 新创建 cron job 没有马上执行 ## 
 
 新创建的cron job，不会马上执行，至少要过2分钟才执行。如果重启cron则马上执行。
 
@@ -166,7 +165,7 @@ use the following command add entries to crontab should take effect right away.
 
 更新系统时间时区后需要重启cron,在ubuntu中服务名为cron:
 
-### 注意环境变量问题 ###
+### 7.3 注意环境变量问题 ###
 
 有时我们创建了一个crontab，但是这个任务却无法自动执行，而手动执行这个任务却没有问题，这种情况一般是由于在crontab文件中没有配置环境变量引起的。
 
@@ -174,7 +173,7 @@ use the following command add entries to crontab should take effect right away.
 
 0 * * * * . /etc/profile;/bin/sh /var/www/java/audit_no_count/bin/restart_audit.sh    
     
-### ubuntu下启动、停止与重启cron ###
+### 7.4 ubuntu下启动、停止与重启cron ###
 
 $sudo /etc/init.d/cron start
 $sudo /etc/init.d/cron stop

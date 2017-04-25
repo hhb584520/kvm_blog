@@ -32,12 +32,24 @@
        中的 bug 的影响) 与普通的列表模式相同。  
 -  --version 显示 lspci 的版本。这个选项应当单独使用。
 
+## 2.常用命令 ##
+lspci -Dn -s $bdf  
+-D 选项表示在输出信息中显示设备的 domain  
+-n 选项表示用数字的方式显示设备的 vendor ID 和 device ID  
+-s 选项表示仅显示后面指定的一个设备的信息  
+
+lspci -k -s $bdf  
+-k 表示输出信息中显示正在使用的驱动和内核中可以支持该设备的模板。
+
+lspci -v -s $bdf | grep SR-IOV  
+查看PCI设备是否支持 SR-IOV 功能
+
  
-## 2. 实例 ##
+## 3. 实例 ##
 
 实例1：不必加上任何选项，就能够显示出目前的硬件配备
 
-    # lspci00:00.0 
+    # lspci
     // 主板芯片
     Host bridge: Intel Corporation 3200/3210 Chipset DRAM Controller  
     // USB控制器
@@ -75,7 +87,7 @@
     Command: DPERE- ERO+ RBC=512 OST=1Status: Dev=00:00.0 64bit- 133MHz- SCD- USC- DC=simple DMMRBC=2048 DMOST=1 DMCRS=8 RSCEM- 266MHz- 533MHz-
 
  
-## 3.附录 ##
+## 4.附录 ##
 附录1：为了能使用这个命令所有功能，你需要有 linux 2.1.82 或以上版本，支持 /proc/bus/pci 接口的核心。在旧版本核心中，PCI工具必须使用只有root才能执行的直接硬体访问，而且总是出现竞争状况以及其他问题。
 如果你要报告 PCI 设备驱动中，或者是 lspci 自身的 bugs，请在报告中包含 “lspci -vvx” 的输出。
 

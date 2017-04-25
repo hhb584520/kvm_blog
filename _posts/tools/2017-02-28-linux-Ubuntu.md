@@ -32,58 +32,7 @@ permission denied
     [plain] view plain copy 在CODE上查看代码片派生到我的代码片
     restart ssh  
 
-
-## 2.安装源配置 ##
-请注意：
-如果在安装中部分软件无法安装成功，说明软件源中缺包，先尝试使用命令#apt-get update更新软件源后尝试安装。如果还是不行，需要更换软件源。更换步骤：
-
-- 输入命令#cp /etc/apt/sources.list /etc/apt/sources.list_backup
-- 输入命令#vi /etc/apt/sources.list
-- 添加其他软件源（推荐使用163、中科大、上海交大等速度较快的国内源）
-- 保存并关闭窗口
-- 输入命令：#apt-get update
-
-### 2.1 安装远程源 ###
-for ubuntu14.04.4 source
- 
-gedit /etc/apt/sources.list
-
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty main restricted
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty main restricted
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates main restricted
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates main restricted
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty universe
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty universe
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates universe
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates universe
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty multiverse
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty multiverse
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates multiverse
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-updates multiverse
-    deb http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-backports main restricted universe multiverse
-    deb-src http://linux-ftp.sh.intel.com/pub/mirrors/ubuntu/ trusty-backports main restricted universe multiverse
-
-### 2.2 安装本地源 ###
-第一步转到镜像的下载目录，挂载ISO镜像挂载至/media/cdrom下。
-代码:
-sudo mount -o loop -t iso9660 update-i386-20080312-CD1.iso /media/cdrom
-
-第二步手动添加ISO镜像至软件源列表，这样就可以在软件库里找到ISO上所有的软件包
-代码:
-sudo apt-cdrom -m -d=/media/cdrom add
-
-第三步刷新软件库
-代码:
-sudo apt-get update
-
-注意，执行完成后查看/etc/apt/sources.list文件，确保文件如下一行在文件顶部或者在网络源前面，否者，安装软件的时候系统还是优先从网络上下载【建议把除了dvd本地源之外的下面所有项注视掉，不建议删除，之后在apt-get update更新下】
-deb cdrom:[Ubuntu 9.04 _Jaunty Jackalope_ - Release i386 (20090421.3)]/ jaunty main restricted
-
-之后就可以用apt-get install ** 来安装软件包了，不过有点问题，这命令执行一次可能会不成功，多执行几次就OK了
-
- 
-
-## 3.修改环境变量 ##
+## 2.修改环境变量 ##
 Ubuntu Linux系统环境变量配置文件： 
 
 - /etc/profile : 在登录时,操作系统定制用户环境时使用的第一个文件 ,此文件为系统的每个用户设置环境信息,当用户第一次登录时,该文件被执行。 
@@ -143,99 +92,8 @@ PASH环境变量的设置方法：
 输入:wq保存退出； 
 然后键入/sbin/reboot重启系统（可能会提示need to boot，此时直接power off） 
 
-## 4.安装Eclipse ##
-
-### 4.1安装 JDK ###
-**下载JDK**
-
-http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-
-**卸载原来包**
-
-If you’ve already installed OpenJDK in Ubuntu Software Center. Remove it by running this command:
-
-    sudo apt-get purge openjdk*
-
-**安装JDK**
-
-Change directory to the location where you would like the JDK to be installed, then move the .tar.gz archive binary to the current directory.
-
-Unpack the tarball and install the JDK.
-
-% tar zxvf jdk-8uversion-linux-x64.tar.gz
-
-**配置环境变量**
-
-vim .bashrc
-增加下面两行
-export JAVA_HOME=/$unpack_dir/
-export PATH=$PATH:/$unpack_dir/bin
-You should use your path($unpack_dir) as per your installation
-javac -version
-
-**ref**
-http://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFJJEFG
-
-### 4.2安装 Eclipse ###
-    $ mkdir -p /opt  
-    $ cd /opt/  
-    $ wget http://ftp.osuosl.org/pub/eclipse/technology/epp/downloads/release/mars/1/eclipse-cpp-mars-1-linux-gtk-x86_64.tar.gz
-    
-    $ tar -zxvf eclipse-cpp-mars-1-linux-gtk-x86_64.tar.gz
-    $ cd eclipse
-    $ vim /usr/share/applications/eclipse.desktop
-		[Desktop Entry]
-		Name=Eclipse 4
-		Type=Application
-		Exec=/opt/eclipse/eclipse
-		Terminal=false
-		Icon=/opt/eclipse/icon.xpm
-		Comment=Integrated Development Environment
-		NoDisplay=false
-		Categories=Development;IDE;
-		Name[en]=Eclipse
-
-## 5. vncserver 配置 ##
-
-用root账户名密码登陆后
-
-1.在ubuntu上安装vncserver，使用命令：# apt-get install vnc4server
-
-2.开启vnc服务，输入命令：#vncserver  
-首次启动会要求设置密码，后面可以使用vncpasswd修改；
-看到 New ‘****:1 (****)’ desktop is ****:1 (****代表主机名）即表示启动vnc成功，在主目录下产生一个.vnc目录；
-
-3.在客户端下载“vnc客户端”软件，进行链接  
-在服务器栏输入：ip：1  
-输入用户名密码信息后，可以看到vnc连接页面  
-但是，这个页面好像不是我们想要的图形化界面。vncserver默认使用的窗口管理器是twm，这是一个很简陋的窗口管理器，下面我们把桌面改成GNOME或KDE。
-
-4.备份原有xstartup文件: #cp ~/.vnc/xstartup  ~/.vnc/xstartup.bak  
-下面我们需要修改vnc启动文件，使用命令：#vi ~/.vnc/xstartup  
-
-我们“x-window-manager &”这一行注释掉，然后在下面加入一行“gnome-session &”，或者是“startkde &”，分别启动GNOME桌面和KDE桌面。这里我们安装的是GNOME桌面。修改后如下图所示：（具体修改步骤：打开文件后，点击“insert”按钮，这时就可以输入了，在“x-window-manager &”前加“#”，然后回车输入“gnome-session &”，然后点击“Esc ”退出编辑模式，输入“:wq!”保存修改即可）
-
-5.这时我们需要杀掉原桌面进程，输入命令：# vncserver -kill :1//这里的:1是桌面号  
-再次输入： #vncserver :1生成新的会话
-
-6.下面我们开始安装gnome桌面环境  
-这里的安装有些慢，需要您耐心等待下。  
-(1)安装x－windows的基础 ：#sudo apt-get install x-window-system-core
-
-(2)安装登录管理器：#sudo apt-get install gdm （还可以为kdm/xdm）
-
-(3)安装Ubuntu的桌面：#sudo apt-get install ubuntu-desktop（还可以为Kubunut-desktop/ Xubuntu-desktop ）
-
-另外：  
-安装命令：apt-get install gnome-core可以安装GNOME的一些基础。apt-get install firefox/gaim/xmms可以安装 Firefox 浏览器、Gaim 聊天程序、XMMS 音乐播放器。您可以按照自己的喜好来安装。
- 
-7.下面我们重复步骤5
-
-8.编辑/etc/rc.local在文件最后一行加入：  
-su root -c '/usr/bin/vncserver -name my-vnc-server -depth 16 -geometry 1280x800 :1'即可实现开机自启动
-
-## 6. 配置开机启动服务 ##
-### 6.1背景知识 ###
+## 3. 配置开机启动服务 ##
+### 3.1背景知识 ###
 Linux系统任何时候都运行在一个指定的运行级上，并且不同的运行级程序和服务都不同，所要完成的工作和要达到的目的也不同，系统可以在这些运行级之间进行切换，来完成不同的工作。
 
 运行级别等级：  
@@ -257,21 +115,21 @@ runlevel显示上次的运行级别和当前的运行级别，“N”表示没�
 
 init 0 表示关机
 
-### 6.2启动步骤 ###
+### 3.2启动步骤 ###
 - 读取MBR信息，启动Boot Manager，Linux通常使用GRUB作为Boot Manager。
 - 加载系统内核，启动init进程。init进程是Linux的根进程，所有的系统进程都是它的子进程。
 - init进程读取/etc/inittab文件中的信息，并进入预设的运行级别。在这里需要说下的是，在ubuntu的6.10版本以后，就没有了/etc/inittab文件，是因为inittab已经被update软件包所取代了，具体的可以查看/usr/share/doc/update目录。就不在这里介绍了。
 - 执行/etc/rcS.d/目录下的脚本，然后是/etc/rcX.d/目录下的脚本，X代表的是数字0～6。rcS.d和rcX.d目录下的文件都是以，S或K加上两位数字组成的，其中S代表start，K代表kill，而两位数字代表启动顺序，数字越大代表级别越低。
 
-### 6.3设置开机启动项 ###
+### 3.3设置开机启动项 ###
 
 	$ apt-get install sysv-rc-conf
 	$ sysv-rc-conf
 
 它具有操作简单，简洁的操作界面，你可以使用鼠标点击，也可以使用键盘操作，空格键代表选择，“X”表示开启服务，Ctrl+N下一页，Ctrl+P上一页，Q退出。
 
-## 7. PXE ##
-### 7.1 PXE简介###
+## 4. PXE ##
+### 4.1 PXE简介###
 PXE (Pre-boot Execution Environment)：是由Intel设计的协议，它可以使计算机通过网络启动。
 TFTP (trivial file transfer protocol)：一种开销很小的文件传输协议。因简单、高效，常用于网络设备的OS和配置更新.
 DHCP (Dynamic Host Control Protocol) ：动态主机控制协议。用于集中、动态的给客户机分配IP地址.
@@ -282,7 +140,7 @@ PXE协议的成功运行需要解决以下两个问题：
 第一个问题：使用DHCP服务器动态分配IP地址给PXE Client。
 第二个问题：主机的ROM中内置了TFTP客户端程序，使用TFTP协议从服务器下载所需文件。
 
-### 7.3 安装环境 ###
+### 4.2 安装环境 ###
 提供PXE的服务器的IP为192.168.1.133
 操作系统为ubuntu12.04.3 server
 ubuntu镜像下载位置：/home/shang/ubuntu-12.04.3-server-amd64.iso
@@ -312,7 +170,7 @@ try_files含义参见：nginx-coremodule，其实就是文件路径选择顺序�
 
 使用浏览器访问此IP 192.168.1.133，如果出现 welcome to nginx，则配置成功
 
-### 7.4 TFTP服务安装配置 ###
+### 4.3 TFTP服务安装配置 ###
 安装tftpd（tftp服务器）、tftp（tftp客户端）以及xinetd（超级服务器）
 tftp通过xinetd守护进程来管理，详细信息参见：Linux 超级守护进程 xinetd
 
@@ -353,7 +211,7 @@ prepare_ubuntu_iso
 	Received 60 bytes in 0.0 seconds
 	tftp> quit
 
-### 7.5 DHCP服务安装配置 ###
+### 4.4 DHCP服务安装配置 ###
 
 	# sudo apt-get -y install dhcp3-server
 
@@ -373,7 +231,7 @@ DHCP自动分配给客户端的IP地址范围为： 192.168.1.221 ~ 192.168.1.24
 
 	# sudo service isc-dhcp-server start
 
-### 7.6 客户端启动安装 ###
+### 4.5 客户端启动安装 ###
 我使用VirtualBox虚拟机新建虚拟机，来测试PXE。局域网内的物理机一样操作。
 
 - 当虚拟机启动时，取消镜像选择。
@@ -388,14 +246,11 @@ DHCP自动分配给客户端的IP地址范围为： 192.168.1.221 ~ 192.168.1.24
 - 这里是自动填写的
 - ubuntu-pxe-mirror
 
-### 7.7 参考 ###
+### 4.6 参考 ###
 http://digitalsanctum.com/2013/03/22/how-to-setup-a-pxe-server-on-ubuntu/
 http://manpages.ubuntu.com/manpages/precise/en/man5/dhcpd.conf.5.html
 
-## 8. 制作 deb 包 ##
-http://www.cnblogs.com/sunyubo/archive/2010/08/27/2282129.html
-
-## 9. 中文字符设置 ##
+## 5. 中文字符设置 ##
 我们在安装ubuntu server版的时候，有人可能选择了中文环境安装，因为那样好设置时区等参数，可是安装好了后，运行某些命令的时候会有中文乱码提示，看起很是头蛋疼，我们就需要将其改成英文环境。我们需要修改的文件/etc/default/locale#sudo vim /etc/default/l...
 我们在安装ubuntu server版的时候，有人可能选择了中文环境安装，因为那样好设置时区等参数，可是安装好了后，运行某些命令的时候会有中文乱码提示，看起很是头蛋疼，我们就需要将其改成英文环境。
 我们需要修改的文件/etc/default/locale
@@ -428,49 +283,3 @@ http://www.cnblogs.com/sunyubo/archive/2010/08/27/2282129.html
 - 下载中文语言包：apt-get install language-pack-zh-hans-base
 - 默认语言设置为中文：运行update-locale LANG=zh_CN.UTF-8和update-locale LANGUAGE=zh_CN.zh
 - 重启系统：reboot，这样就变成中文环境了
-
-nfs目录
-
-	 1693  vi /etc/exports
-	root@HOST-HZ-200:/home/work# cat /etc/exports 
-	# /etc/exports: the access control list for filesystems which may be exported
-	#		to NFS clients.  See exports(5).
-	#
-	# Example for NFSv2 and NFSv3:
-	# /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
-	#
-	# Example for NFSv4:
-	# /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
-	# /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
-	#
-	/home/work	 127.0.0.1 (rw,sync,no_root_squash)
-	 1694  /etc/init.d/nfs-kernel-server start
-	 1695  mount -t nfs 127.0.0.1:/home/work /var/lib/nova/instances/
-
-# 10. 网络配置 #
-auto lo
-iface lo inet loopback
-
-auto eth0
-iface eth0 inet static
-        address 115.238.105.214
-        netmask 255.255.255.248
-        network 115.238.105.208
-        broadcast 115.238.105.215
-        gateway 115.238.105.209
-        # dns-* options are implemented by the resolvconf package, if installed
-        dns-nameservers 202.101.172.25
-
-auto eth2
-iface eth2 inet manual
-
-auto br0
-iface br0 inet static
-        bridge_ports eth2
-        address 12.0.0.200
-        netmask 255.255.255.0
-        network 12.0.0.0
-        broadcast 12.0.0.255
-        gateway 12.0.0.1
-        # dns-* options are implemented by the resolvconf package, if installed
-        dns-nameservers 12.0.0.1

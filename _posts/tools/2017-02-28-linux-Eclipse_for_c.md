@@ -107,10 +107,60 @@ JRE另外一种配置方法：
 
 分别将这两个目录中的所有文件分别剪到/opt/eclipse下的对应目录里，即可。（Eclipse的插件安裝方法几乎都这样安装： 把文件下载后， 直接解到eclipse所安装的目录中对应的features和plugins中即可。）
 
+## 3.安装Eclipse ##
 
+### 3.1 安装 JDK ###
+**下载JDK**
+
+http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+**卸载原来包**
+
+If you’ve already installed OpenJDK in Ubuntu Software Center. Remove it by running this command:
+
+    sudo apt-get purge openjdk*
+
+**安装JDK**
+
+Change directory to the location where you would like the JDK to be installed, then move the .tar.gz archive binary to the current directory.
+
+Unpack the tarball and install the JDK.
+
+% tar zxvf jdk-8uversion-linux-x64.tar.gz
+
+**配置环境变量**
+
+vim .bashrc
+增加下面两行
+export JAVA_HOME=/$unpack_dir/
+export PATH=$PATH:/$unpack_dir/bin
+You should use your path($unpack_dir) as per your installation
+javac -version
+
+**ref**
+http://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFJJEFG
+
+### 3.2 安装 Eclipse ###
+    $ mkdir -p /opt  
+    $ cd /opt/  
+    $ wget http://ftp.osuosl.org/pub/eclipse/technology/epp/downloads/release/mars/1/eclipse-cpp-mars-1-linux-gtk-x86_64.tar.gz
+    
+    $ tar -zxvf eclipse-cpp-mars-1-linux-gtk-x86_64.tar.gz
+    $ cd eclipse
+    $ vim /usr/share/applications/eclipse.desktop
+		[Desktop Entry]
+		Name=Eclipse 4
+		Type=Application
+		Exec=/opt/eclipse/eclipse
+		Terminal=false
+		Icon=/opt/eclipse/icon.xpm
+		Comment=Integrated Development Environment
+		NoDisplay=false
+		Categories=Development;IDE;
+		Name[en]=Eclipse
    
-# 3.如何在Eclipse上开发C/C++程序 #
-## 3.1 建立Hello Word project ##
+# 4.如何在Eclipse上开发C/C++程序 #
+## 4.1 建立Hello Word project ##
 - 建立C/C++ project
 - 选择Managed Make C++ Project(若选择Managed Make C++ Project，Eclipse会自动为我们建立make file；若选择Standard Make C++ Project，则必须自己写make file。)
 - 输入Project name
@@ -123,12 +173,12 @@ JRE另外一种配置方法：
 - 执行程序(显示在下方的Console区)
 
 
-## 3.2 如何在Eclipse CDT中Debug C/C++程序 ##
+## 4.2 如何在Eclipse CDT中Debug C/C++程序 ##
 - 在Eclipse中Debug，就如同在一般IDE中Debug一样，只要在程序代码的左方按两下，就可加入breakpoint。
 - 启动Debug
 - Debug设定，按Debug开始Debug
 - 单步执行，显示变量变化
 
 
-# 4.结论 #
+# 5.结论 #
 Eclipse为Linux在C/C++开发提供一个完善的IDE环境，事实上，以我用过众多IDE的经验，除了Visual Studio最方便外，Eclipse的好用也直追Visual Studio，并且超越Borland C++ Builder及Dev C++，虽然安装上比较麻烦，但只要依照本文介绍一步一步的设定，就一定可完成Eclipse设定，若想要在Windows平台使用gcc compiler，也建议使用Eclipse + CDT + MinGW的组合。

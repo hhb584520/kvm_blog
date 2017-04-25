@@ -1,15 +1,57 @@
-# 怎样使用rpm命令一次性删除依赖的软件包 #
+## 1.构建rpm 包
+http://www.bkjia.com/Linuxjc/994106.html
+针对该文档，需要修改 下载源码到 BUILD目录，最后 %files 去掉，这是我实践的一个结果
+
+	vim nginx.spec
+	
+	  1 Name: nginx
+	  2 Summary: high performance web server
+	  3 Version: 1.2.1
+	  4 Release: 1.e15.ngx
+	  5 License: 2-clause BSD-like license
+	  6 Group: Applications/Server
+	  7 Source: http:/nginx.org/download/nginx-1.2.1.tar.gz
+	  8 URL: http://nginx.org/
+	  9 Distribution: Linux
+	 10 Packager: huanghaibin <haibin.huang@intel.com>
+	 11
+	 12 %description
+	 13 nginx is a HTTP and reverse proxy server, as well as a mail proxy server.
+	 14
+	 15 %prep
+	 16 rm -rf $RPM_BUILD_DIR/nginx-1.2.1
+	 17 zcat $RPM_BUILD_DIR/nginx-1.2.1.tar.gz | tar -xvf -
+	 18
+	 19 %build
+	 20
+	 21 cd nginx-1.2.1
+	 22 ./configure --prefix=/usr/local/nginx
+	 23
+	 24 make
+	 25
+	 26 %install
+	 27 cd nginx-1.2.1
+	 28 make install
+	 29
+	 30 %preun
+	 31 if [ -z "`ps aux | grep nginx | grep -v grep`" ];then
+	 32     killall nginx >/dev/null
+	 33     exit 0
+	 34 fi
+	 35
+
+## 2. 怎样使用rpm命令一次性删除依赖的软件包 
 
 搜索了一下网络，发现解法大体有两种：
 
-## 第一种方法：不管依赖包　##
+### 2.1 第一种方法：不管依赖包
 
 相互依赖的软件包，使用rpm的--nodeps参数就搞定了.  
 rpm --nodeps -e gdm-2.24.1-4.fc10.i386
 
 也就是说不检查依赖。这样的话，那些使用该软件包的软件在此之后可能就不能正常工作了。
  
-## 第二种方法：手工添加依赖包到命令行 ##
+### 2.2 第二种方法：手工添加依赖包到命令行
 
 执行
 
@@ -36,7 +78,7 @@ rpm --nodeps -e gdm-2.24.1-4.fc10.i386
     [root@localhost ~]#
  
  
-# 第三种方法：用脚本 #
+### 2.3 第三种方法：用脚本
 
 编写一个 force_remove_package.sh 的Bash脚本，内容如下：
 
@@ -59,4 +101,5 @@ rpm --nodeps -e gdm-2.24.1-4.fc10.i386
 - awk命令里面的 $8，是经过尝试出来的，因为 rpm -e 命令输出的信息中包含有很多空格；  
 - rpm -e 的错误输出需要重定向到标准输出，否则就不会得到依赖包，而直接输出在终端上了。  
 
- 
+## 3. 制作 deb 包 ##
+http://www.cnblogs.com/sunyubo/archive/2010/08/27/2282129.html
