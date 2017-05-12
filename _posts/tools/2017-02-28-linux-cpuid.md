@@ -1,51 +1,35 @@
 # 1. CPUID #
-## 1.1 通过代码读取 CPUID 信息
+## 1.1 介绍
+CPUID 是用于获取某个 CPU 是否支持某个 Feature 工具。为了读取到 CPU 的支持的 Feature 数据，我们需要有一套机器。
 
-	#include <stdlib.h>
-	#include <stdio.h>
-	
-	static inline void __cpuid(unsigned int *eax, unsigned int *ebx,
-	                                unsigned int *ecx, unsigned int *edx)
-	{
-	        /* ecx is often an input as well as an output. */
-	        asm volatile("cpuid"
-	            : "=a" (*eax),
-	              "=b" (*ebx),
-	              "=c" (*ecx),
-	              "=d" (*edx)
-	            : "0" (*eax), "2" (*ecx)
-	            : "memory");
-	}
-	
-	/*
-	 * Generic CPUID function
-	 * clear %ecx since some cpus (Cyrix MII) do not set or clear %ecx
-	 * resulting in stale register contents being returned.
-	 */
-	static inline void cpuid(unsigned int op, unsigned int count,
-	                         unsigned int *eax, unsigned int *ebx,
-	                         unsigned int *ecx, unsigned int *edx)
-	{
-	        *eax = op;
-	        *ecx = 0;
-	        __cpuid(eax, ebx, ecx, edx);
-	}
-	
-	main()
-	{
-	        unsigned int eax, ebx, ecx, edx;
-			unsigned int eax_in=18, ecx_in=0;
+一般我们会传入 EAX和ECX，返回数据保存在 EBX, ECX, EDX 里面，然后根据里面值来判断是否支持某个Feature，注意这里要结合芯片手册，如 intel 3abcd.
 
-	        cpuid(eax_in, ecx_in, &eax, &ebx, &ecx, &edx);
-	
-	        printf("eax=%lx, ecx=%lx: eax=%lx, ebx=%lx, ecx=%lx, edx=%lx\n", eax_in, ecx_in,eax, ebx, ecx, edx);
-	}
+传入EAX里面值称为 CPUID leaf，传入ECX里面值称为 CPUID subleaf.
+
+具体介绍也可参考下面的网站：
+
+https://en.wikipedia.org/wiki/CPUID
+
+## 1.2 通过代码读取 CPUID 信息
+
+gcc -o cpuid_common cpuid_common.c
+./cpuid_common
+
+[cpuid_common.c](/kvm_blog/files/cpuid/cpuid_common.c)
+
+[cpuid_sgx.c](/kvm_blog/files/cpuid/cpuid_sgx.c)
 
 根据输出的值对看 intel 手册
 
-## 1.2 通过工具读取 CPUID信息
+## 1.3 通过工具读取 CPUID信息
+有如下两个工具：
+
+- CPU-Z 
+- cpuid
+
 请参考下面链接，不再叙述
 https://www.cyberciti.biz/faq/linux-cpuid-command-read-cpuid-instruction-on-linux-for-cpu/
+
 
 # 2. Search CPU microarchitecture #
 
