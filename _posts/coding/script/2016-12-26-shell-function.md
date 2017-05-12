@@ -168,6 +168,39 @@
     491 done
     492 OPTIND=1
 
+
+	[root@hhb-kvm tools]# sh getopt.sh --instance hhj --data hho --quit
+	#!/bin/sh
+	#set -x
+	quita=0
+	
+	ARGV=($(getopt -a -l instance:,data:,quit -- "$@"))
+	eval set -- "$ARGV"
+	while true
+	do
+	    case "$1" in
+	    --instance)
+	            echo $2
+	            shift 2
+	            ;;
+	    --data)
+	        echo "$2"
+	            shift 2
+	            ;;
+	    --)
+	        shift
+	        quita=1
+	            ;;
+	    esac
+	
+	    if [ $quita=="1" ]; then
+	            break
+	    fi
+	done
+	
+	echo "yui"
+
+
 ### 3.4 特殊参数 ###
 $? 执行上一个指令的返回值，可以获取上一个命令的退出状态。所谓退出状态，就是上一个命令执行后的返回结果
 
