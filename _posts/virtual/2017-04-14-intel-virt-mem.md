@@ -117,7 +117,7 @@ Guest OS所维护的页表负责传统的从guest虚拟地址GVA到guest物理�
 
 SPD是PD的影子页表，SPT1/SPT2是PT1/PT2的影子页表。由于客户PDE和PTE给出的页表基址和页基址并不是真正的物理地址，所以我们采用虚线表示PDE到GUEST页表以及PTE到普通GUEST页的映射关系。
 
-![](/kvm_blog/img/spt2.png)
+![](/kvm_blog/img/spts.png)
 
 ### 2.2 影子页表的建立
 
