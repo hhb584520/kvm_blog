@@ -30,7 +30,7 @@ Guest OS维护的页表进行传统的操作
 GPA->HVA
 KVM的虚拟机实际上运行在Qemu的进程上下文中。于是，虚拟机的物理内存实际上是Qemu进程的虚拟地址。Kvm要把虚拟机的物理内存分成几个slot。这是因为，对计算机系统来说，物理地址是不连续的，除了bios和显存要编入内存地址，设备的内存也可能映射到内存了，所以内存实际上是分为一段段的。
 
-![](/kvm_blog/img/gpa-hva.png)
+![](/kvm_blog/img/gpa_hva.png)
 
 ### 1.3 QEMU 中物理内存的注册
 
@@ -214,7 +214,7 @@ VT-x提供了Extended Page Table(EPT)技术
 - 在原有的CR3页表地址映射的基础上，EPT引入了EPT页表来实现另一次映射。
 - GVA->GPA->HPA两次地址转换都由CPU硬件来完成。
 
-![](/kvm_blog/img/mmu-ept.png)
+![](/kvm_blog/img/mmu_ept.png)
 
 ### 3.1 二维地址翻译结构
 
@@ -228,7 +228,7 @@ EPT维护GPA->HPA的映射
 - 如果没有，CPU触发EPT Violation,由VMM截获处理；
 - 假设客户机有m级页表，宿主机EPT有n级，在TLB均miss的最坏情况下，会产生m*n次内存访问，完成一次客户机的地址翻译；
 
-![](/kvm_blog/img/mmu-ept1.png)
+![](/kvm_blog/img/mmu_ept1.png)
 
 ### 3.3 EPT页表的建立流程
 
