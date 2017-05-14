@@ -142,7 +142,7 @@ Virtio半虚拟化设备方式的优点是实现了VIRTIO API，减少了VM-Exit
 
 KVM虚拟机支持将宿主机中的PCI、PCI-E设备附加到虚拟化的客户机中，从而让客户机以独占方式访问这个PCI（或PCI-E）设备。通过硬件支持的VT-d技术将设备分配给客户机后，在客户机看来，设备是物理上连接在其PCI（或PCI-E）总线上的，客户机对该设备的I/O交互操作和实际的物理设备操作完全一样，这不需要（或者很少需要）Hypervisor（即KVM）的参与。KVM中通过VT-d技术使用一个PCI-E网卡的系统架构示例如下图所示
 
-![](/kvm_blog/img/kvm-vtd-demo.jpg)
+![](/kvm_blog/files/virt_io/kvm-vtd-demo.jpg)
 
 运行在支持VT-d平台上的QEMU/KVM，可以分配网卡、磁盘控制器、USB控制器、VGA显卡等给客户机直接使用。而为了设备分配的安全性，它还需要中断重映射（interrupt remapping）的支持，尽管QEMU命令行进行设备分配时并不直接检查中断重映射功能是否开启，但是在通过一些工具使用KVM时（如RHEL6.3中的libvirt）默认需要有中断重映射的功能支持，才能使用VT-d分配设备给客户机使用。
 
@@ -241,8 +241,8 @@ VFIO设备实现层与Linux设备模型紧密相连，当前，VFIO中仅有针�
 VFIO是一套用户态驱动框架，可用于编写高效用户态驱动；在虚拟化情景下，亦可用来在用户态实现device passthrough。通过VFIO访问硬件并无新意，VFIO可贵之处在于第一次向用户态开放了IOMMU接口，能完全在用户态配置IOMMU，将DMA地址空间映射进而限制在进程虚拟地址空间之内。这对高性能用户态驱动以及在用户态实现device passthrough意义重大。
 
 # 参考资料 #
-[2012-forum-VFIO.pdf](/kvm_blog/files/2012-forum-VFIO.pdf)
+[2012-forum-VFIO.pdf](/kvm_blog/files/virt_io/2012-forum-VFIO.pdf)
 
-[VT-d-Posted-Interrupts-final.pdf](/kvm_blog/files/VT-d_Posted_Interrupts_final.pdf)
+[VT-d-Posted-Interrupts-final.pdf](/kvm_blog/files/virt_io/VT-d_Posted_Interrupts_final.pdf)
 
-[vt-directed-io-spec.pdf](/kvm_blog/files/vt-directed-io-spec.pdf)
+[vt-directed-io-spec.pdf](/kvm_blog/files/virt_io/vt-directed-io-spec.pdf)
