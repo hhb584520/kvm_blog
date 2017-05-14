@@ -3,7 +3,7 @@
 - 提供给虚拟机一个从零地址开始的连续物理内存空间。
 - 在各虚拟机之间有效隔离、调度以及共享内存资源
 
-[kvm-overview.pdf](/kvm_blog/files/kvm-overview.pdf)
+[kvm-overview.pdf](/kvm_blog/files/virt_mem/kvm-overview.pdf)
 
 ## 1. 概述
 为了让客户机操作系统使用一个隔离的、从零开始且具有连续性的内存空间，VMM引入一层新的地址空间，即客户机物理地址空间。客户机物理地址空间是客户机操作系统所能“看见”和管理的物理地址空间，这个地址空间不是真正的物理地址空间，它和物理地址空间还有一层映射。有了客户机物理地址空间，就形成了从应用程序所在的客户机虚拟地址到客户机物理地址，再从客户机物理地址到宿主机物理地址的两层地址转换。前一个转换由客户机操作系统完成，后一个转换由 VMM 负责。
@@ -30,7 +30,7 @@ Guest OS维护的页表进行传统的操作
 GPA->HVA
 KVM的虚拟机实际上运行在Qemu的进程上下文中。于是，虚拟机的物理内存实际上是Qemu进程的虚拟地址。Kvm要把虚拟机的物理内存分成几个slot。这是因为，对计算机系统来说，物理地址是不连续的，除了bios和显存要编入内存地址，设备的内存也可能映射到内存了，所以内存实际上是分为一段段的。
 
-![](/kvm_blog/img/gpatohva.png)
+![](/kvm_blog/files/virt_mem/gpatohva.png)
 
 ### 1.3 QEMU 中物理内存的注册
 
@@ -111,13 +111,13 @@ Guest OS所维护的页表负责传统的从guest虚拟地址GVA到guest物理�
 解决方案：影子页表 (Shadow Page Table)
 作用：GVA直接到HPA的地址翻译,真正被VMM载入到物理MMU中的页表是影子页表；
 
-![](/kvm_blog/img/spt1.png)
+![](/kvm_blog/files/virt_mem/spt1.png)
 
 ### 2.1 影子映射关系
 
 SPD是PD的影子页表，SPT1/SPT2是PT1/PT2的影子页表。由于客户PDE和PTE给出的页表基址和页基址并不是真正的物理地址，所以我们采用虚线表示PDE到GUEST页表以及PTE到普通GUEST页的映射关系。
 
-![](/kvm_blog/img/spts.png)
+![](/kvm_blog/files/virt_mem/spts.png)
 
 ### 2.2 影子页表的建立
 
@@ -214,7 +214,7 @@ VT-x提供了Extended Page Table(EPT)技术
 - 在原有的CR3页表地址映射的基础上，EPT引入了EPT页表来实现另一次映射。
 - GVA->GPA->HPA两次地址转换都由CPU硬件来完成。
 
-![](/kvm_blog/img/mmu_ept.png)
+![](/kvm_blog/files/virt_mem/mmu_ept.png)
 
 ### 3.1 二维地址翻译结构
 
@@ -228,7 +228,7 @@ EPT维护GPA->HPA的映射
 - 如果没有，CPU触发EPT Violation,由VMM截获处理；
 - 假设客户机有m级页表，宿主机EPT有n级，在TLB均miss的最坏情况下，会产生m*n次内存访问，完成一次客户机的地址翻译；
 
-![](/kvm_blog/img/mmu_ept1.png)
+![](/kvm_blog/files/virt_mem/mmu_ept1.png)
 
 ### 3.3 EPT页表的建立流程
 

@@ -1,7 +1,7 @@
 ## 1. X86 VTx 介绍
 ### 1.1 VMX 介绍
 
-![](/kvm_blog/img/vmx-ring.png)
+![](/kvm_blog/files/virt_cpu/vmx-ring.png)
 
 - VMEntry: VMX root -> VMX non-root 
 - VMExit: VMX nonroot -> VMX root 
