@@ -30,7 +30,7 @@
 	
 	main()
 	{
-	        unsigned int eax, ebx, ecx, edx;
+	    unsigned int eax, ebx, ecx, edx;
 			unsigned int eax_in=18, ecx_in=0;
 
 	        cpuid(eax_in, ecx_in, &eax, &ebx, &ecx, &edx);
