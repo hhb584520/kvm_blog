@@ -28,7 +28,7 @@ https://blog.packagecloud.io/eng/2016/06/22/monitoring-tuning-linux-networking-s
 现在的虚拟设备大部分都是采用前后端模型，前文提到的每种资源都可以采用下面的方法进行虚拟化。故应该有9种组合。
 我们可以看看下图中实际 qemu 模拟设备。
 
-![](/kvm_blog/img/i440fx.png)
+![](/kvm_blog/files/virt_io/i440fx.png)
  
 ## 2.1 方法
 - 软件模拟
@@ -67,7 +67,7 @@ https://blog.packagecloud.io/eng/2016/06/22/monitoring-tuning-linux-networking-s
 	- PV(Hypercall)
 	- Pass-thru(DMA Remapping)
 
-![](/kvm_blog/img/iommu.png)
+![](/kvm_blog/files/virt_io/iommu.png)
 
 客户机直接操作设备面临如下问题：
 - 如何让客户机直接访问到设备真实的 I/O 地址空间（包括端口 I/O 和 MMIO）
