@@ -30,4 +30,4 @@ KVM 对 “KVM嵌套KVM”的支持从 2010 年开始了，目前已经比较成
 
 # 2. 参考资料 #
 
-[NestedVirtualization.pdf](/kvm_blog/files/NestedVirtualization.pdf)
+[NestedVirtualization.pdf](/kvm_blog/files/virt_others/NestedVirtualization.pdf)
