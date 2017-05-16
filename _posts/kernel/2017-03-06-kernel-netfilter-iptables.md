@@ -1,8 +1,8 @@
 # 1. iptables #
 
-![](/kvm_blog/img/iptables-snat.png)
+![](/kvm_blog/files/kernel/iptables-snat.png)
 
-![](/kvm_blog/img/iptables_traverse.jpg)
+![](/kvm_blog/files/kernel/iptables_traverse.jpg)
 
 iptables 的表和链： 
 

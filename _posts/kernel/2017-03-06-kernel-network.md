@@ -343,11 +343,11 @@ Disk: 7200 rpm
 
 第一组， 固定buffer 的个数（10， 100， 1000）， 依次增加buffer的大小， 从1KB -- 1024KB， 数据如下， （基准线为相应write（）的数据）例如， 10 个buffer， 每个buffer size 是1KB。 write() 耗时0.092 ms, writev() 耗时0.098 ms, 图中的数据即为 1.067 (write_v10, 1KB)
 
-![](/kvm_blog/img/testdata_buffercount.gif)
+![](/kvm_blog/files/kernel/testdata_buffercount.gif)
 
 第二组， 固定buffer大小（1KB， 2KB， 8KB）， 依次增加buffer的数目， 从 200 -- 8000, 数据如下 （基准线为相应write（）的数据）
 
-![](/kvm_blog/img/testdata_buffersize.gif)
+![](/kvm_blog/files/kernel/testdata_buffersize.gif)
 
 结论：
 writev() 应使用在small write intensive 的workload中， buffer size 应控制在 2KB 以下， 同时buffer的数目不要超过IOV_MAX, 否则 writev() 并不会带来性能的提高。 
