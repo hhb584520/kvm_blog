@@ -56,7 +56,8 @@ http://blog.163.com/xychenbaihu@yeah/blog/static/132229655201311884819764/
 
 --sync，将脏数据写入磁盘
 
-
+## 3.1 slub 内存分配
+[linux-slub.docx](/kvm_blog/files/kernel/linux-slub.docx)
 
 
 # 4. 物理内存地址布局
@@ -335,6 +336,8 @@ http://www.kerneltravel.net/journal/v/mem.htm
 附：x86体系的地址映射图(注意，是地址，而不是ram)
  
 ![](/kvm_blog/files/kernel/address_map.gif)
+
+
 
 # 5.内存碎片分析#
 前言，本案例分析s2lm遇到的CPU飙升问题，深入研究Linux的内存回收、分配机制、分析内存碎片和CPU飙升原因。并提出将SD卡录像使用的cache从系统的cache中抽取出来进行管理的方案来解决内存碎片问题.

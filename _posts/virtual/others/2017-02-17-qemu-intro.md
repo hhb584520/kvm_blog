@@ -29,7 +29,7 @@ Memory consumption was calculated by running “free –m” after launching eac
 
 ### 2.1.2 Average Memory Per VM ###
 
-![](/kvm_blog/img/average_memory_per_vm.jpg)
+![](/kvm_blog/files/virt_others/average_memory_per_vm.jpg)
 
 **Synopsis**
 RAW is the unadjusted memory consumption as measured by the calculating free’s “used” delta.  ADJUSTED incorporates the estimated overhead of memory consumption by the kernel that is directly related to the container/VM (see Caveats section for more details).
@@ -103,7 +103,7 @@ Vegeta is a HTTP load testing tool written in Golang, whose goal is to create a 
 The server is a minimalistic Golang HTTP server based on the Gorilla Mux router.  Three APIs are exposed: DOWNLOAD, UPLOAD and TRANSCODE.  For UPLOADs, the server can be told to do one of the following a) copy request body to disk, b) copy request body to temp file and immediately delete or c) copy request body to /dev/null (discard).  Behaviors (a) and (b) were used for the tests.
 
 ### 2.2.2 Sustained Request Rate ###
-![](/kvm_blog/img/sustained_request_rate.jpg)
+![](/kvm_blog/files/virt_others/sustained_request_rate.jpg)
 
 **Synopsis**  
 This graph shows the latency, in seconds, of download requests in the 99th percentile; that is, the latency in which 99% of all requests are being handled. A separate run of Vegeta was done for each request rate, with each run lasting 60 seconds.  The download target is a set of 10 video files, ranging in size from 26mb to 186mb, which targets selected by a basic round robin algorithm.  To sustain the desired request rate, Vegeta spins up worker goroutines as needed.  Note: The Y-axis is logarithmic.
@@ -117,7 +117,7 @@ Production environments are highly unlikely to use a software bridge for system 
 As is probably expected, native performance is significantly better than LXD, which in turn is significantly better than Qemu.  The loss in performance is almost certainly due to overhead in the software bridge (LXD and Qemu) and in the virtio driver (Qemu).  Measuring performance by overloading to the point of failure provides a powerful graphic as it is trivial to translate these results to “here are the number of machines you’ll need to handle X amount of traffic”.
 
 ### 2.2.3 Fixed Worker Request Rates ###
-![](/kvm_blog/img/fixed_worker_request_rate.jpg)
+![](/kvm_blog/files/virt_others/fixed_worker_request_rate.jpg)
 
 **Synopsis**  
 This chart shows the number of requests per second that was achieved with a fixed number of workers and requests.  

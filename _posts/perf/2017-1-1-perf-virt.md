@@ -1,6 +1,6 @@
 # 1. 性能评测
 ## 1.1 SPECvirt 介绍
-[zh-rhev-performance-specvirt-benchmark.pdf](/kvm_blog/files/zh-rhev-performance-specvirt-benchmark-11728837.pdf)
+[zh-rhev-performance-specvirt-benchmark.pdf](/kvm_blog/files/perf/zh-rhev-performance-specvirt-benchmark-11728837.pdf)
 
 # 2. 性能分析
 主要几类系统分析工具，一种是通过软件预先设定的探针，来记录 VMM 感兴趣的事件。

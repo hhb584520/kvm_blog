@@ -35,7 +35,7 @@ http://www.thomas-krenn.com/en/wiki/Activating_the_Intel_VT_Virtualization_Featu
  
 - copy config to linux
 	
-	cp [config_for_kvm](/kvm_blog/files/config_for_kvm) .config
+	cp [config_for_kvm](/kvm_blog/files/virt_others/config_for_kvm) .config
 
 comments:
  if you debug, you want just compile kvm.ko and kvm_intel.ko

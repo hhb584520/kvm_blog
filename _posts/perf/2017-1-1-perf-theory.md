@@ -27,7 +27,7 @@
 
 ## 1.3 测试优化基本流程 ##
 
-![](/kvm_blog/img/perf_flow.png)
+![](/kvm_blog/files/perf/perf_flow.png)
 
 ## 1.4 测试优化基础知识 ##
 程序性能的问题，有很多原因，总结如下三点：

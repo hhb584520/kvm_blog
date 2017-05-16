@@ -56,3 +56,7 @@
 - shell 运算符
 
 	http://blog.csdn.net/brandohero/article/details/8521640
+
+- 编程指南
+
+[Linux与unix shell编程指南.pdf](/kvm_blog/files/coding_script/Linux与unix shell编程指南.pdf)
