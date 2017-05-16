@@ -882,10 +882,16 @@ Please do not use non-standard header files (e.g. malloc.h,linux/fcntl.h). They 
    
 If you are not sure which ones are standard, please look at the  man pages of corresponding functions (e.g. man 2 open, man malloc).
 
-# 12. kernel parameters # 
+# 12. Others
+## 12.1 kernel parameters
 https://www.kernel.org/doc/Documentation/kernel-parameters.txt
 
 http://www.jinbuguo.com/
+
+## 12.2 license
+1.BSD类许可证，允许随意商业集成。
+2.MPL类许可证，修改后的源代码需公开。
+3.GPL类许可证，传染性/商业不友好。
 
 # 参考资料 #
 

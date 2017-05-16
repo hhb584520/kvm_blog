@@ -422,6 +422,20 @@ cache结构:grab_cache_page_write_begin->__page_cache_alloc
 
 总结：Cache虽然可以提高硬盘读者的性能，但是确实会存在引起内存碎片问题，因为cache申请的内存分散开导致没有整片的内存！
 
+# 6. 锁定内存 #
+﻿
+fp = fopen("/proc/self/maps", "r");
+ 
+
+fgets(line, sizeof(line), fp);
+
+sscan
+f(line, "%08x-%08x", &addrStart, &addrEnd);
+
+ret = mlock((void *)addrStart, addrEnd-addrStart);
+
+一定要读一下内存
+
 # 参考资料 #
 
 反向映射  
