@@ -31,7 +31,7 @@ Linux内核学习书籍推荐
 
 看来两者之间就这点区别了，至于access_ok，看过源码的人都知道那不过是验证一下地址范围而已，我开始还以为这个函数会操作页目录表，事实上完全不是。
 
-##2. ipc##
+## 2. ipc ##
 https://www.ibm.com/developerworks/cn/linux/l-ipc/
 
 管道通信（父子进程）
@@ -881,6 +881,11 @@ http://www.spongeliu.com/165.html
 Please do not use non-standard header files (e.g. malloc.h,linux/fcntl.h). They can cause portability problems, such as what Paul encountered.
    
 If you are not sure which ones are standard, please look at the  man pages of corresponding functions (e.g. man 2 open, man malloc).
+
+# 12. kernel parameters # 
+https://www.kernel.org/doc/Documentation/kernel-parameters.txt
+
+http://www.jinbuguo.com/
 
 # 参考资料 #
 
