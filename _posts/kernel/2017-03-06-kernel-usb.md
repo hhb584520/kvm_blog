@@ -213,7 +213,7 @@ bInterval
 
 # 2. V4L2 框架 #
 
-![](/kvm_blog/kernel/v4l2.jpg)
+![](/kvm_blog/files/kernel/v4l2.jpg)
 
 ## 2.1 V4l2 介绍
 http://www.cnblogs.com/hzhida/archive/2012/05/29/2524397.html

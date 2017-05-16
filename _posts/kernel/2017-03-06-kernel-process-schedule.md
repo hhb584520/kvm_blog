@@ -1,6 +1,6 @@
 # 1. 调度器 #
 
-![](/kvm_blog/img/sched_class.jpg)
+![](/kvm_blog/files/kernel/sched_class.jpg)
 
 核心调度器由周期性调度器和主调度器，其中周期性调度器在 scheduler_tick中实现。如果系统正在活动中，内核会按照频率HZ自动调用该函数; 主调度器在内核的许多地方，如果要将CPU分配给与当前活动进程不同的另一个进程，都会直接调用主调度器函数(schedule)
 
