@@ -449,3 +449,4 @@ slab 分配器
 http://blog.csdn.net/vanbreaker/article/details/7671618
 
 http://www.ilinuxkernel.com/files/Linux_Physical_Memory_Page_Allocation.pdf
+[Linux_Physical_Memory_Page_Allocation.pdf](/kvm_blog/files/kernel/Linux_Physical_Memory_Page_Allocation.pdf)
