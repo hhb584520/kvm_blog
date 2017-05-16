@@ -61,7 +61,7 @@ root-->node 叫深度，node --> 自身最低叶子节点， 叫高度
 
 # 4. 结构体打包技艺 #
 
-![](/kvm_blog/img/structure_package.gif)
+![](/kvm_blog/files/coding_cplus/structure_package.gif)
 
 http://blog.csdn.net/21aspnet/article/details/6729724
 
