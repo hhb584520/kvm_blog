@@ -1,7 +1,7 @@
 # 1. 内存地址转换 #
 
 
-![](/kvm_blog/img/address_v2p.png)
+![](/kvm_blog/files/kernel/address_v2p.png)
 
 
 # 2. 内存地址布局
@@ -14,7 +14,7 @@
 - 栈区，由编译器自动分配释放，存放函数的参数值，局部变量的值等。其操作方式类似数据结构中的栈。
 - 文字变量区，常量字符串就是放在这里的。程序结束后由系统释放。
 
-![](/kvm_blog/img/process_address_space.png)
+![](/kvm_blog/files/kernel/process_address_space.png)
 
 用户进程地址空间的内存地址分配可以通过 pmap命令查看。你也可以通过ps命令显示总的段大小。
 这是一个前辈写的，非常详细
@@ -48,7 +48,7 @@ http://blog.163.com/xychenbaihu@yeah/blog/static/132229655201311884819764/
 
 # 3. 内存全景图
 
-![](/kvm_blog/img/memory.gif)
+![](/kvm_blog/files/kernel/memory.gif)
 
 
 1.清理Cache
@@ -334,7 +334,7 @@ http://www.kerneltravel.net/journal/v/mem.htm
 
 附：x86体系的地址映射图(注意，是地址，而不是ram)
  
-![](/kvm_blog/img/address_map.gif)
+![](/kvm_blog/files/kernel/address_map.gif)
 
 # 5.内存碎片分析#
 前言，本案例分析s2lm遇到的CPU飙升问题，深入研究Linux的内存回收、分配机制、分析内存碎片和CPU飙升原因。并提出将SD卡录像使用的cache从系统的cache中抽取出来进行管理的方案来解决内存碎片问题.
@@ -400,7 +400,7 @@ Node 0, zone Normal 931 1337 11 0 0 0 0 0 0 0 0
 
 上面讲到了要解决内存碎片问题，可以从 cache 入手，我的想法是如果把 sd 卡录像使用的 cache 从系统 cache 中分离出来，进行预分配，并且由自己进行甘利，就如前面所讲的，把不能回收的和能够回收的内存分开管理。
 
-![](/kvm_blog/img/cache_pool.png)
+![](/kvm_blog/files/kernel/cache_pool.png)
 
 设计思路，如上图所示：
 创建一个内存池，写 sd 卡时从池中申请页面用于 cache，当池中的页面个数小于一半时，释放 cache还回池中，但不还给操作系统。
