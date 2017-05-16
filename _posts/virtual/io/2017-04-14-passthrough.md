@@ -243,6 +243,6 @@ VFIO是一套用户态驱动框架，可用于编写高效用户态驱动；在�
 # 参考资料 #
 [2012-forum-VFIO.pdf](/kvm_blog/files/virt_io/2012-forum-VFIO.pdf)
 
-[VT-d-Posted-Interrupts-final.pdf](/kvm_blog/files/virt_io/VT-d_Posted_Interrupts_final.pdf)
+[VTd-Posted-Interrupts-final.pdf](/kvm_blog/files/virt_io/VTd-Posted-Interrupts-final.pdf)
 
 [vt-directed-io-spec.pdf](/kvm_blog/files/virt_io/vt-directed-io-spec.pdf)
