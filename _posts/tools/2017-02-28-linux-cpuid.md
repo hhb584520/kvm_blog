@@ -15,9 +15,9 @@ https://en.wikipedia.org/wiki/CPUID
 gcc -o cpuid_common cpuid_common.c
 ./cpuid_common
 
-[cpuid_common.c](/kvm_blog/files/cpuid/cpuid_common.c)
+[cpuid_common.c](/kvm_blog/files/tools/cpuid_common.c)
 
-[cpuid_sgx.c](/kvm_blog/files/cpuid/cpuid_sgx.c)
+[cpuid_sgx.c](/kvm_blog/files/tools/cpuid_sgx.c)
 
 根据输出的值对看 intel 手册
 
