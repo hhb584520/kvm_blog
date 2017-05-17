@@ -19,6 +19,10 @@ gcc -o cpuid_common cpuid_common.c
 
 [cpuid_sgx.c](/kvm_blog/files/tools/cpuid_sgx.c)
 
+或者
+git clone https://github.com/01org/msr-tools.git
+gcc -o cpuid cpuid.c
+
 根据输出的值对看 intel 手册
 
 ## 1.3 通过工具读取 CPUID信息
