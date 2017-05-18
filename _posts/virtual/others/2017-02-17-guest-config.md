@@ -1,6 +1,5 @@
-# 其它配置 #
+# 配置文件 #
 ## 1. xl 和 qemu-system-x86_64 的帮助
-
 ### 1.1 XL ###
 
 	1. 下载Xen的源码
@@ -10,88 +9,190 @@
 
 	https://xenbits.xen.org/docs/unstable/man/xl.cfg.5.html
 
+基本上 xen 配置文件都可以在这里查到
+
+	https://xenbits.xen.org/docs/unstable/man/xl.cfg.5.html
+
+通过源码安装
+
+	git clone https://xenbits.xen.org/git-http/xen.git
+	make docs
+	make install_docs
+	man xl.cfg
+
 ### 1.2 Qemu-system-x86_64 ###
     
 	qemu-system-x86_64 --help
     qemu-system-x86_64 -cpu help 
 
 	https://wiki.archlinux.org/index.php/QEMU_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
- 
-## 2. Network
-### 2.1 bridge
-#### 2.1.1 添加接口到网桥
-- 添加 br0 这个 bridge
-  
-	brctl addbr br0
 
-- 将 br0 与 eth0 绑定起来     
+## 2.CPU
+### 2.1 CPU 参数
+CPU(s) (逻辑CPU数) = Socket(s) * Core(s) per socket  * Thread(s) per core
+
+	# lscpu
+	CPU(s):                56			逻辑CPU数
+	On-line CPU(s) list:   0-55			
+	Thread(s) per core:    2			每个核上的逻辑CPU个数
+	Core(s) per socket:    14			每个物理CPU上核的个数
+	Socket(s):             2			物理CPU数
+
+#### 2.1.1 KVM
+如果不设置，默认值除 maxcpus 外，其余全为 1
     
-	brctl addif br0 eth0
+-smp n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]
 
-- 将 br0 设置为启用 STP 协议
+    可以使用下面命令查看
+        info cpus 
+        ps -efL | grep qemu   # 其中 -L可以查看线程 ID。
+
+### 2.2 CPU 模型
+#### 2.2.1 KVM
+- 查看当前的 QEMU 支持的所有 CPU 模型（cpu_model, 默认的模型为qemu64）
+        
+	qemu-system-x86_64 -cpu ?
+	其中加了 [] ，如 qemu64, kvm64 等CPU模型是 QEMU命令中原生自带 (built-in) 的，现在所有的定义都放在 target-i386/cpu.c 文件中
+
+- 尽可能多地将物理CPU信息暴露给客户机
+        
+	-cpu host
+
+- 改变 qemu64 类型CPU的默认类型
+        
+	-cpu qemu64,model=13
+
+- 可以用一个 CPU模型作为基础，然后用“+”号将部分的CPU特性添加到基础模型中去
+        
+	-cpu qemu64,+avx
+
+#### 2.3 进程的处理器亲和性和 vCPU 的绑定 #
+注：特别是在多处理器、多核、多线程技术使用的情况下，在NUMA结构的系统中，如果不能基于对系统的CPU、内存等有深入的了解，对进程的处理器亲和性进行设置导致系统的整体性能的下降而非提升。
+
+**隔离 CPU**
+
+     vi grub.cfg
+     title Red Hat ........
+         root (hd0,0)
+         kernel /boot/vmlinuz-3.8 ro root=UUID=****** isoplus=2,3
+
+    检查是否隔离成功，第一行的输出明显大于2、3行。
+            ps -eLO psr | grep 0 | wc -l 
+            ps -eLO psr | grep 2 | wc -l
+            ps -eLO psr | grep 3 | wc -l
+
+#### 2.3.1 KVM  
+
+**启动一个客户机**
     
-	brctl stp br0 on
+	qemu-system-x86_64 rhel6u3.img -smp 2 -m 512 -daemonize
 
-    注：在这里使用 STP 主要是为了避免在建有 bridge 的以太网 LAN 中出现环路。如果不打开 STP，则可能出现数据链路层的环路，从而导致建有 bridge 的主机网络不畅通。
+**绑定 vCPU**
 
-- 将 eth0 的 IP 设置为0
-    
-	dhclient br0
+- 查看代表 vCPU 的QEMU进程
 
-- 参看路由表是否正常配置
-    
-	route
+    ps -eLo ruser,pid,ppid,lwp,psr,args | grep qemu | grep -v grep
 
-#### 2.1.2 删除 virbr0
-安装 KVM 后都会发现网络接口里多了一个叫做 virbr0 的虚拟网络接口
-一般情况下，虚拟网络接口virbr0用作nat，以允许虚拟机访问网络服务，但nat一般不用于生产环境。我们可以使用以下方法删除virbr0
+- 绑定代表整个客户机的 QEMU 进程，使其运行在 cpu2/cpu3 上，其中 3963为 qemu主线程、3967和3968分别为两个 vCPU.
 
-- 先使用virsh net-list查看所有的虚拟网络：
+    taskset -p 0x4 3963
+    taskset -p 0x4 3967
+    taskset -p 0x8 3968
 
-		[root~]# virsh net-list               //列出kvm虚拟网络
+- 查看绑定是否有效
+       
+	ps -eLo ruser,pid,ppid,lwp,psr,args | grep qemu | awk '{if$5==2 print $0}'
+    Ctrl + Alt +2 -->  info cpus
 
-- 卸载与删除virbr0虚拟网络接口
+#### 2.3.2 Xen  
+**启动一个客户机**
 
-		$ virsh net-destroy default    //重启libvirtd服务后会恢复  
-		$ virsh net-undefine default   //彻底删除，重启系统后也不会恢复
- 
+**绑定 vCPU**
+XEN how to use vcpu pin cpu
 
-#### 2.1.3 恢复virbr0
+	#!/bin/bash
+	domid=$1
+	cpus_num=$2
+	for i in `seq 0 $cpus_num`
+	do
+	xl vcpu-pin $domid $i $i
+	done
 
-- 其实上面的做法，其实就是删除了/var/lib/libvirt/network/default.xml文件，
-
-  恢复的方法，我们需要从另一台kvm宿主机上把default.xml文件复制过来，并将下面的<uuid>标签对及<mac>标签去掉。
-
-	<!--
-	WARNING: THIS IS AN AUTO-GENERATED FILE. CHANGES TO IT ARE LIKELY TO BE 
-	OVERWRITTEN AND LOST. Changes to this xml configuration should be made using:
-	  virsh net-edit default
-	or other application using the libvirt API.
-	-->
+you can put this in the vm config
 	
-	<network>
-	  <name>default</name>
-	  <uuid>ef1080c8-61d0-421e-8358-0568afb21093</uuid>
-	  <forward mode='nat'/>
-	  <bridge name='virbr0' stp='on' delay='0' />
-	  <mac address='52:54:00:01:59:93'/>
-	  <ip address='192.168.122.1' netmask='255.255.255.0'>
-	    <dhcp>
-	      <range start='192.168.122.2' end='192.168.122.254' />
-	    </dhcp>
-	  </ip>
-	</network>
+cpus="CPU-LIST"
 
-- 从一个xml文件定义default网络，执行如下命令：
+	List of which cpus the guest is allowed to use. Default is no pinning at all (more on this below). A "CPU-LIST" may be specified as follows:
+	"all"
+	    To allow all the vcpus of the guest to run on all the cpus on the host.
+	
+	"0-3,5,^1"
+	    To allow all the vcpus of the guest to run on cpus 0,2,3,5. Combining this with "all" is possible, meaning "all,^7" results in all the vcpus of the guest running on all the cpus on the host except cpu 7.
+
+### 2.4 CPU Hotplug Support in QEMU
+-----
+[1] http://www.linux-kvm.org/images/0/0c/03x07A-Bharata_Rao_and_David_Gibson-CPU_Hotplug_Support_in_QEMU.pdf
+[2] https://www.youtube.com/watch?v=WuTPq8XgEbY
+ 
+
+## 2. Network
+### 2.1 虚拟机网桥配置 ###
+#### 2.1.1 KVM ####
+**新的方法**  
+qemu-system-x86_64 -enable-kvm -m 4096 -monitor pty -smp 64 -no-acpi -drive file=/share/xvs/var/tmp-img_CPL_CPU_288VCPU_4_1483531055_1,if=none,id=virtio-disk0 -device virtio-blk-pci,drive=virtio-disk0 -device virtio-net-pci,netdev=nic0, -netdev tap,id=nic0,script=/etc/kvm/qemu-ifup –daemonize
+
+qemu-system-x86_64 -enable-kvm -m 4096 -monitor pty -smp 64 -no-acpi -drive file=/share/xvs/var/tmp-img_CPL_CPU_288VCPU_4_1483531055_1,if=none,id=virtio-disk0 -device virtio-blk-pci,drive=virtio-disk0 -device e1000,netdev=nic0, -netdev tap,id=nic0,script=/etc/kvm/qemu-ifup –daemonize
+
+**老的方法**  
+qemu-system-x86_64 -enable-kvm -m 4096 -monitor pty -smp 2 -no-acpi -drive file=/share/xvs/var/tmp-img_CPL_CPU_288VCPU_4_1483531055_1,if=none,id=virtio-disk0 -device virtio-blk-pci,drive=virtio-disk0 -net nic,model=rtl8139 -net tap,name=tap0,script=/etc/kvm/qemu-ifup  -daemonize
 
 
-		$ virsh net-define /var/lib/libvirt/network/default.xml   //从一个default.xml文件定义(但不开始)一个网络
+**备注：**
 
+	[root@hhb-kvm ]# cat /etc/kvm/qemu-ifup
+	#!/bin/sh
+	
+	switch=$(brctl show| sed -n 2p |awk '{print $1}')
+	/sbin/ifconfig $1 0.0.0.0 up
+	/usr/sbin/brctl addif ${switch} $1
 
-- 设置virbr0自动启动，执行如下命令：
+#### 2.1.2 XEN
 
-		$ virsh net-start default           //开始一个(以前定义的default)不活跃的网络,执行后ifconfig可见virbr0
-		$ virsh net-autostart default       //执行后Autostart外会变成yes
+配置文件添加如下项
+	
+	vif = [ 'type=ioemu, mac=00:16:3e:14:e4:d5, bridge=xenbr0' ]
+
+### 2.2 虚拟直通网卡配置
+**直通网卡**
+
+qemu-system-x86_64 -enable-kvm -m 4096 -monitor pty -smp 64 -no-acpi -drive file=/share/xvs/var/tmp-img_CPL_CPU_288VCPU_4_1483531055_1,if=none,id=virtio-disk0 -device virtio-blk-pci,drive=virtio-disk0 -device vfio-pci,host=${bdf} -net none –daemonize
+
+### 2.3 参数说明
+    
+qemu-system_x86-64启动加如下参数
+-net nic,model=rtl8139 -net tap,script=/etc/kvm/qemu-ifup
+-device virtio-net-pci,netdev=nic0,mac=52:54:00:0c:12:78 -netdev tap,id=nic0,script=/etc/kvm/qemu-ifup
+
+"-device ?" 参数查看到有哪些可用的驱动器，可以用 "-device driver,?"查看到某个驱动器支持的所有属性。
+-device pci-assign,host=08:00.0,id=mydev0,addr=0x6
+
+(1) -net nic
+
+为客户机创建一个网卡，这个主要是模拟网卡
+
+(2) -net user
+
+让客户机使用不需要管理员权限的用户模式网络，如“-net nic -net user"
+
+(3) -net tap
+
+使用宿主机的 TAP 网络接口来帮助客户机建立网络。使用网桥连接和 NAT 模式网络的客户机都会使用到 -net tap参数。如 "-net nic -net tap,ifname=tap1,script=/etc/qemu-ifup,downsript=no"
+        
+(4) -net dump
+转存出网络中的数据流量，之后可以用 tcpdump或wireshark 分析。
+
+(5) -net none
+当不需要配置任何网络设备时，需要使用。默认是会被设置"-net nic -net user"
 
 
 ## 3. 鼠标飘移问题
