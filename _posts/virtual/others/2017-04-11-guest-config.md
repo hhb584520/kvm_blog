@@ -26,6 +26,7 @@
     qemu-system-x86_64 -cpu help 
 
 	https://wiki.archlinux.org/index.php/QEMU_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+	http://download.qemu-project.org/qemu-doc.html
 
 ## 2.CPU
 ### 2.1 CPU 参数
@@ -194,7 +195,277 @@ qemu-system_x86-64启动加如下参数
 (5) -net none
 当不需要配置任何网络设备时，需要使用。默认是会被设置"-net nic -net user"
 
+## 3. Serial ##
 
+**添加串口参数**
+
+	menuentry 'Ubuntu' {
+        load_video
+		......
+        linux   /boot/vmlinuz-4.2.0-27-generic root=UUID=cf0213...34 ro console=tty0 console=ttyS0,115200,8n1 3
+	}
+
+添加下面参数: **console=tty0 console=ttyS0,115200,8n1 3**
+
+### 3.1 KVM Serial
+#### 3.1.1 修改 guest
+
+
+
+#### 3.1.2 创建虚拟机
+
+	#!/bin/sh
+	qemu-system-x86_64 -enable-kvm -m 4096 -smp 4 -serial pty -cpu host \
+	-device virtio-net-pci,netdev=nic0,mac=00:16:3e:0c:12:78 \
+	-netdev tap,id=nic0,script=/etc/kvm/qemu-ifup \
+	-drive file=/haibin/ubuntu_sgx.qcow2,if=none,id=virtio-disk0 \
+	-device virtio-blk-pci,drive=virtio-disk0
+
+#### 3.1.3 连接串口
+
+	minicom -D /dev/pts/1
+
+
+### 3.2 Xen Serial
+#### 3.2.1 创建虚拟机
+
+	[root@l1xen haibin]# cat config.test
+	builder = "hvm"
+	......
+	serial = 'pty'
+	......
+	on_crash = 'preserve'
+
+
+#### 3.2.2 连接串口
+
+	xl console domid
+
+
+## 4. 内存
+### 4.1 内存设置基本参数
+(1) -m megs 参数
+
+[root@skl-sp2 ~]# qemu-system-x86_64 -m ?
+qemu-system-x86_64: -m ?: Parameter 'size' expects a size
+You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes and terabytes.
+默认单位 MB，也可以使用 G 来表示GB单位的内存大小，如“-m 4G”表示 4GB 内存大小。
+
+这里看到的内存都不准，主要是该命令显示的大小是总内存除去了内核执行文件占用内存和一些系统保留的内存之后能使用的内存
+cat /proc/meminfo
+free -m真实的内存大小
+dmesg | grep Memory
+
+(2) -mem-path path  参数
+     启动时即分配全部的内存，而不是根据客户机请求而动态分配内存，主要是分配大页内存如 “-mem-path /dev/hugepages”。
+
+(3) -mem-prealloc  参数
+      启动时即分配全部的内存，而不是根据客户机请求而动态分配，必须与 "-mem-path"参数一起使用。
+
+(4) -balloon 开启内存气球的设置
+     “-balloon virtio”为客户机提供 virtio_balloon 设备，从而通过内存气球 balloon, 可以在QEMU monitor 中用
+"balloon" 命令来调节客户机占用内存的大小（-m 参数设置的内存范围内）。
+
+### 4.2 Numa
+#### 4.2.1 KVM Numa
+qemu-system-x86_64 \
+-enable-kvm \
+-drive format=raw,file=/root/vdisk.img,index=0,media=disk \
+-cpu host \
+-m 20480 \
+-smp cpus=64,cors=64,threads=1,sockets=1 \
+-object memory-backend-ram,size=10240M,host-nodes=0,policy=bind,id=node0 \
+-numa node,nodeid=0,cpus=0-63,memdev=node0 \
+-object memory-backend-ram,size=10240M,host-nodes=1,policy=bind,id=node1 \
+-numa node,nodeid=1,memdev=node1 \
+-acpitable file=/sys/firmware/acpi/tables/PMTT 
+
+#### 4.2.2 Xen Numa
+** Xen Hypervisor**
+
+Compile and install latest Xen. RH 7.2 is preferable dom0 OS.
+Add `dom0_mem=2048M,max:4096M` to Xen boot command line to limit dom0 memory occupation.
+Reboot and boot Xen.
+`xl info –n` to check whether hypervisor can see 2 nodes in Quadrant Mode (8 nodes in SNC-4 Mode).
+ 
+** Build guest with vNUMA**
+ 
+In guest configuration file, add something like:
+
+```
+memory=2048
+vnuma = [ ["pnode=0", "vcpus=0-3", "size=1024", "vdistance=10, 31"],
+		  ["pnode=1", "size=1024", "vdistance=31, 10" ]
+```
+Normally you can use the values from "xl info -n" or "numactl -H" to fill size and vdistance list.
+
+-----------------------------
+## 5.存储
+### 5.1 存储配置和启动顺序
+
+for xen:
+https://wiki.xen.org/wiki/Using_Xen_PV_Drivers_on_HVM_Guest
+
+### 5.2 存储的基本配置项 ##
+    -hda file
+        将 file 镜像文件作为客户机中的第一个 IDE 设备，在客户机中表现为 /dev/hda 设备（若客户机中使用 PIIX_IDE驱动）或 /dev/sda 设备（若客户机中使用 ata_piix 驱动） 。
+    -fda file
+        将 file 作为第一个软盘设备，在客户机中为 /dev/fd0
+    -cdrom file
+        将 file 作为客户机中的光盘 CD-ROM，在客户机中通常表现为 /dev/cdrom
+    -mtdblock file
+        使用 file 文件作为客户机自带的一个 Flash 存储器。
+    -sd file
+        使用 file 文件作为客户机中的 SD卡
+
+### 5.3 详细配置存储驱动器的 -driver 参数 ##
+    较新的版本 Qemu 还提供了 -driver 参数来详细定义一个存储驱动器，该参数的具体形式如下：
+    -drive option[,option[,option[,option[,...]]]
+    -> file=file 使用 file 文件作为镜像文件加载到客户机的驱动器中。
+    -> if=interface 指定驱动器使用的接口类型，可用的类型有：ide, scsi, sd, mtd, floopy, pflash, virtio, 等等。
+    -> cache=cache 设置宿主机对块设备数据访问中的 cache 情况，可以设置为 none, off, writeback, writethrough。
+    -drive file=rhel6u3.img,if=virtio 的参数配置使用 virtio-block 驱动来支持该磁盘文件。
+
+### 5.4 配置客户机启动顺序的参数 ##
+    -boot  [ order=drives ] [,once=drives] [,menu=on|off][,splash=splashfile][,splash-time=sp-time]
+       -> order : 'a', 'b' 分别表示第一和第二个软驱，用 ‘c’ 表示表示第一个硬盘，用 'd' 表示 CD-ROM 光驱，用 ’n' 表示从网络启动。
+       -> once : 表示设置第一次启动的顺序。
+       -> menu : 表示交互式的启动菜单。
+
+     -boot order=dc -hda rhel6u3.img -cdrom rhel6u3.iso 
+    让 rhel6u3.img 文件作为 IDE 磁盘，安装光盘 rhel6u3.iso 作为IDE光驱，并且从光盘启动客户机，从而让客户机进入到系统安装的流程中。
+
+## 1.4  存储配置的示例 ##
+	qemu-system-x86_64 -m 1024 -smp 2 rhel6u3.img
+	qemu-system-x86_64 -m 1024 -smp 2 -hda rhel6u3.img
+	qemu-system-x86_64 -m 1024 -smp 2 -drive file=rhel6u3.img,if=ide,cache=writethrough
+
+# 2. qemu-img 命令  #
+    qemu-img 是 QEMU 的磁盘管理工具，在完成了QEMU后，就会默认编译好工具
+   
+## 2.1 对磁盘镜像文件做一致性检查 ##
+    qemu-img check rhel6u3.qcow2
+
+## 2.2 创建磁盘镜像 ##
+提示: 在QEMU Wikibook QEMU images参见更多信息
+硬盘镜像是一个文件，存储虚拟机硬盘上的内容。除非直接从 CD-ROM 或网络引导并且不安装系统到本地，运行 QEMU 时都需要硬盘镜像。
+一个硬盘镜像可能是 raw镜像, 和客户机器上看到的内容一模一样，主机上占用的空间客户机上的大小一样。这个方式 I/O 效率最高，但是因为客户机器上没使用的空间也被占用，所以有点浪费空间。另外一种方式是qcow2 格式，仅当客户系统实际写入内容的时候，才会分配镜像空间。对客户机器来说，硬盘大小是完整大小，但是在主机系统上实际仅占用和很小的空间。使用这种方式会影响效率.
+QEMU 提供 qemu-img命令创建硬盘镜像.例如创建一个 4 GB raw 格式的镜像:
+
+	$ qemu-img create -f raw image_file 4G
+
+您可以用 -f qcow2 改为创建一个 qcow2 磁盘
+用 dd 或 fallocate 也可以创建一个 raw 镜像。
+Warning: 如果硬盘镜像存储在 Btrfs 系统上，在创建前请考虑禁用 写时复制。
+
+## 2.3 Overlay storage images ##
+You can create a storage image once (the 'backing' image) and have QEMU keep mutations to this image in an overlay image. This allows you to revert to a previous state of this storage image. You could revert by creating a new overlay image at the time you wish to revert, based on the original backing image.
+To create an overlay image, issue a command like:
+
+	$ qemu-img create -o backing_file=img1.raw,backing_fmt=raw -f qcow2 img1.qcow2
+	-o backing_file=img1.raw,backing_fmt 等价于 -b img1.raw
+	qemu-img create -f qcow2 -o ? temp.qcow
+
+这种方式创建的修改，我们可以直接提交修改到已经创建的镜像中，要么在 QEMU monitor 中使用 “commit” 命令或使用“qemu-img commit"命令去手动提交这些改动
+如果想将快照里的相关操作合并到原始镜像中，可以通过下面命令
+
+命令：# qemu-img commit -f qcow2 img1.qcow2
+
+这里还可以基于 qcow 建立 qcow, 也可以采用 commit 方式提交
+
+Warning: The backing image's absolute filesystem path is stored in the (binary) overlay image file. Changing the backing image's path requires some effort.
+Make sure that the original backing image's path still leads to this image. If necessary, make a symbolic link at the original path to the new path. Then issue a command like:
+$ qemu-img rebase -b /new/img1.raw /new/img1.qcow2
+At your discretion, you may alternatively perform an 'unsafe' rebase where the old path to the backing image is not checked:
+$ qemu-img rebase -u -b /new/img1.raw /new/img1.qcow2
+$ qemu-img rebase -u -b /new/img1.qcow2 /new/img2.qcow2
+
+## 2.4 调整镜像大小 ##
+警告: 调整包含NTFS引导文件系统的镜像将无法启动已安装的操作系统. 完整的解释和解决办法参见 [1].
+执行 qemu-img 带 resize 选项调整硬盘驱动镜像的大小.它适用于 raw 和 qcow2. 例如, 增加镜像 10 GB 大小, 运行:
+$ qemu-img resize disk_image +10G 
+After enlarging the disk image, you must use file system and partitioning tools inside the virtual machine to actually begin using the new space. When shrinking a disk image, you must first reduce the allocated file systems and partition sizes using the file system and partitioning tools inside the virtual machine and then shrink the disk image accordingly, otherwise shrinking the disk image will result in data loss!    
+
+扩展 QCOW 的方法：
+
+- make qcow2 file：
+    qemu-img create -b /share/xvs/img/linux/ia32e_rhel7u2_kvm.img -f qcow2 /rhel7u2.qcow2 50G
+- create the guest using the qcow2 file 
+- make a new partitioning and change the partition's system id to LINUX LVM:
+    fdisk /dev/vda
+- pvcreate /dev/sda3
+- vgextend  rhel /dev/vda3
+- lvextend -L +30G /dev/rhel/root
+- xfs_growfs /dev/rhel/root
+
+## 2.5 查看镜像文件的信息 ##
+
+    qemu-img info rhel6u3.img
+
+# 3. Qemu 支持的镜像格式 #
+qemu-img 支持非常多种的文件格式，可以通过 “qemu-img -h” 查看其命令帮助得到
+
+Supported formats: qcow2 blkdebug luks file qed vpc bochs vvfat sheepdog nbd dmg cloop vmdk blkreplay host_cdrom host_device qcow tftp ftp vdi raw ftps vhdx https http null-aio null-co blkverify parallels
+
+下面对其中几种文件格式做简单的介绍
+## 3.1 raw  ##
+原始的磁盘镜像格式，也是 qemu-img 命令默认的文件格式。这种文件格式的优势在于它非常简单且非常容易移植到其它模拟器（Qemu也是一种模拟器）上面去使用。如果客户机文件系统（如 Linux的 ext2/ext3/ext4、windows 的NFS）支持“空洞”，那么镜像文件只有在被写有数据的扇区才会真正占用磁盘空间。
+
+不过采用 dd 命令创建的镜像也是 raw 格式，不过那是一开始就让镜像实际占用了分配的空间，而没有使用稀疏文件的方式对待空洞来节省磁盘空间。
+
+## 3.2 qcow2 ##
+     qcow2 是 QEMU 目前推荐的镜像格式，它是功能最多的格式。它支持稀疏文件以节省存储空间，它支持可选的AES加密以提高镜像文件的安全性，支持基于 zlib 的压缩，支持一个镜像文件中有多个虚拟机快照。
+     在 qemu-img 命令中 qcow2 支持如下几个选项：
+    -> backing_file，用于指定后端镜像文件。
+    -> backing_fmt，设置后端镜像的镜像格式。
+    -> cluster_size，设置镜像中簇的大小，取值在 512B 到 2MB之间，默认值为64KB。较小的簇可以节省镜像文件的空间，而较大的簇可以带来更好的性能。
+    -> preallocation，设置镜像文件的预分配模式，其值可为 off, metadata ，full 之一.
+    -> encryption，用于设置加密，当它等于 "on" 时，镜像被加密。它使用 128 位密钥的 AES 加密算法，故其密码长度可达 16个字符，可以保证加密的安全性较高。
+        qemu-img convert -o encryption
+
+## 4. 客户机的存储方式 ##
+    镜像可以由很多方式来构建，其中几种如下：
+    -> 本地存储的客户机镜像文件
+    -> 物理磁盘或者磁盘分区
+    -> LVM 逻辑分区
+    -> NFS 网络文件系统
+    -> iSCSI（Internet Small Computer System Interface），基于 Internet 的小型计算机系统接口。
+    -> 本地或光纤通道连接的 LUN （Logical Unit Number）。
+    -> GFS（Global File System2）
+
+ 
+# 5.给虚拟机加盘 #
+
+## 5.1 给 qcow 文件扩容 ##
+	qemu-img resize rhel7u2-1.qcow2 +20G
+	qemu-img resize rhel7u2-1.qcow2 -19G
+
+## 5.2 创建新的 qcow 文件 ##
+	qemu-img create -f qcow2 ./linux.qcow2 20G
+
+## 5.3 虚拟机配置文件 ##
+	[root@knl2 288cpus]# cat xen-rhel7u2-1.conf
+	builder= "hvm"
+	name= "vm1-1"
+	memory=4096
+	vcpus=64
+	disk = [ '/share/xvs/haibin/288cpus/rhel7u2-1.qcow2,qcow2,sda,rw', '/share/xvs/haibin/288cpus/linux.qcow2,qcow2,sdb,rw' ]
+	# disk = [ '/share/rhel7.qcow2,qcow2,hda,rw', '/share/linux.qcow2,qcow2,hdb,rw' ]
+	vif = [ 'type=ioemu, mac=00:16:3e:14:e4:d5, bridge=xenbr0' ]
+	vnc=1
+	stdvga=1
+	acpi=1
+	hpet=1
+	usb=1
+	usbdevice='tablet'
+
+# 6.从U盘启动
+ 
+Finally, I found the solution. The command below can boot guest from USB and install OS to harddisk.
+ 
+qemu-system-x86_64 -M q35 --enable-kvm -m 512 -redir tcp:8022::22 -monitor stdio -device nec-usb-xhci -device usb-host,vendorid=0x0951,productid=0x1666,bootindex=1  -hda /home/test.qcow2 
+
+----------------------------
 ## 3. 鼠标飘移问题
     Xen: 配置文件添加如下两项
        usb=1
@@ -449,7 +720,62 @@ qemu-ifup-NAT
 	    exit 1
 	fi
 
+
+# display
+## -sdl 参数 ##
+
+        使用 SDL 方式显示客户机。
+
+## -vnc 参数 ##
+
+        -vnc localhost:2
+	-name 设置显示方式
+    设置客户机名称可用于在某宿主机上唯一标识该客户机，如“-name myname" 参数就表示设置客户机的名称为 myname.
+	设置的名字将会在SDL窗口边框的标题显示，或者在VNC 窗口的标题栏中显示。
+
+## -vga 参数 ##
+
+        设置客户机中的 VGA 显卡类型，默认为 ”-vga cirrus” ，默认会为客户机模拟出 Cirrus Logic GD5446 显卡。“-vga std”会为客户机模拟出带有 Bochs VBE 扩展的标准 VGA显卡，而“-vga none” 参数是不为客户机分配 VGA 卡，会让 VNC或SDL都没有任何显示。
+
+## -nographic 参数 ##
+        完全关闭 QEMU 的图形化界面输出，从而让 QEMU 在模式下完全成为简单的命令行工具。而QEMU中模拟产生的串口被重定向到了当前的控制台中，所以如果在客户机中对其内核进行配置从而让内核的控制台输出重定向到串口后，就依然可以在非图形模式下管理客户机系统。
+        在非图形模式下，使用 Ctrl+a h(按Ctrl+a 之后，再按h 键) 组合键，可以获得终端命令的帮助
+串口设置
+http://0pointer.de/blog/projects/serial-console.html
+
+新的可以采用
+-display sdl
+-display vnc
+-display none
+-display curses
+
+不带图形显示
+修改 guest /boot/grub2/grub.conf
+
+- sudo mount ia32e_rhel7u2_kvm.img -o offset=1048576 /mnt
+- fdisk -l ia32e_rhel7u2_kvm.img
+	
+	Disk rhel7u2_kvm.img: 21.5 GB, 21474836480 bytes, 41943040 sectors
+	Units = sectors of 1 * 512 = 512 bytes
+	Sector size (logical/physical): 512 bytes / 512 bytes
+	I/O size (minimum/optimal): 512 bytes / 512 bytes
+	Disk label type: dos
+	Disk identifier: 0x000e5f14
+
+    Device Boot      Start         End      Blocks   Id  System
+	rhel7u2_kvm.img1   *        2048     1026047      512000   83  Linux
+	rhel7u2_kvm.img2         1026048    41943039    20458496   8e  Linux LVM
+
+- mount ia32e_rhel7u2_kvm.img -o offset=1048576 /mnt
+- vim /mnt/grub2/grub.conf
     
+	change "rhgb quiet" to "console=ttyS0,115200,8n1"
+
+- umount /mnt
+- create guest
+	sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 8192 -smp 1 -hda /home/berta/ia32e_rhel7u2_kvm.img -cpu kvm64 -nographic
+
+
 
 
 

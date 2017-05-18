@@ -54,6 +54,8 @@ X86(包括 x86-32 和 x86-64)架构的CPU默认使用 4KB 大小的内存页面�
 	DirectMap2M:     4804608 kB
 	DirectMap1G:    131072000 kB
 
+	# cat /proc/meminfo
+
 ## 2.4 Create guest   
       
     # vim  ./kvm-rhel7-hugepages.sh
@@ -64,6 +66,9 @@ X86(包括 x86-32 和 x86-64)架构的CPU默认使用 4KB 大小的内存页面�
 	-drive file=/share/xvs/var/rhel7.qcow,if=none,id=virtio-disk0 \
 	-device virtio-blk-pci,drive=virtio-disk0 \
 	-mem-path /dev/hugepages
+
+    qemu-system-x86_64 -m 1024 -smp 2 rhel6u3.img -mem-path /dev/hugepages -mem-prealloc 
+    comment: -mem-prealloc 预先分配好
 
 ## 2.5 查看host huge page
 
@@ -82,6 +87,7 @@ X86(包括 x86-32 和 x86-64)架构的CPU默认使用 4KB 大小的内存页面�
 
 总的来说，对于内存访问密集型的应用，在KVM客户机中使用 huge page 是可以比较明显地提高客户机性能的，不过，它也有一个缺点，使用 huge page 的内存不能被 swap out，也不能使用 ballooning 方式自动增长。
 
+缺点：使用 Huge page 的内存不能被换出，也不能使用 ballooning 方式自动增长
 
 # 3. 参考资料
 
