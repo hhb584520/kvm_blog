@@ -236,7 +236,173 @@ VFIO设备实现层与Linux设备模型紧密相连，当前，VFIO中仅有针�
 
 把设备归于IOMMU group的策略由平台决定。在PowerNV平台，一个IOMMU group与一个PE对应。PowerPC平台不支持将多个IOMMU group作为更大的IOMMU操作单元，故而container只是IOMMU group的简单包装而已。对container进行的IOMMU操作最终会被路由至底层的IOMMU实现层，这实际上将用户态与内核里的IOMMU驱动接连了起来。
 
-### 3.4.3 总结 ###
+### 3.4.3 VFIO 代码 ###
+https://www.kernel.org/doc/Documentation/vfio.txt
+
+VFIO - "Virtual Function I/O"[1]
+-------------------------------------------------------------------------------
+Many modern system now provide DMA and interrupt remapping facilities
+to help ensure I/O devices behave within the boundaries they've been
+allotted.  This includes x86 hardware with AMD-Vi and Intel VT-d,
+POWER systems with Partitionable Endpoints (PEs) and embedded PowerPC
+systems such as Freescale PAMU.  The VFIO driver is an IOMMU/device
+agnostic framework for exposing direct device access to userspace, in
+a secure, IOMMU protected environment.  In other words, this allows
+safe[2], non-privileged, userspace drivers.
+
+Why do we want that?  Virtual machines often make use of direct device
+access ("device assignment") when configured for the highest possible
+I/O performance.  From a device and host perspective, this simply
+turns the VM into a userspace driver, with the benefits of
+significantly reduced latency, higher bandwidth, and direct use of
+bare-metal device drivers[3].
+
+Some applications, particularly in the high performance computing
+field, also benefit from low-overhead, direct device access from
+userspace.  Examples include network adapters (often non-TCP/IP based)
+and compute accelerators.  Prior to VFIO, these drivers had to either
+go through the full development cycle to become proper upstream
+driver, be maintained out of tree, or make use of the UIO framework,
+which has no notion of IOMMU protection, limited interrupt support,
+and requires root privileges to access things like PCI configuration
+space.
+
+The VFIO driver framework intends to unify these, replacing both the
+KVM PCI specific device assignment code as well as provide a more
+secure, more featureful userspace driver environment than UIO.
+
+Groups, Devices, and IOMMUs
+-------------------------------------------------------------------------------
+
+Devices are the main target of any I/O driver.  Devices typically
+create a programming interface made up of I/O access, interrupts,
+and DMA.  Without going into the details of each of these, DMA is
+by far the most critical aspect for maintaining a secure environment
+as allowing a device read-write access to system memory imposes the
+greatest risk to the overall system integrity.
+
+To help mitigate this risk, many modern IOMMUs now incorporate
+isolation properties into what was, in many cases, an interface only
+meant for translation (ie. solving the addressing problems of devices
+with limited address spaces).  With this, devices can now be isolated
+from each other and from arbitrary memory access, thus allowing
+things like secure direct assignment of devices into virtual machines.
+
+This isolation is not always at the granularity of a single device
+though.  Even when an IOMMU is capable of this, properties of devices,
+interconnects, and IOMMU topologies can each reduce this isolation.
+For instance, an individual device may be part of a larger multi-
+function enclosure.  While the IOMMU may be able to distinguish
+between devices within the enclosure, the enclosure may not require
+transactions between devices to reach the IOMMU.  Examples of this
+could be anything from a multi-function PCI device with backdoors
+between functions to a non-PCI-ACS (Access Control Services) capable
+bridge allowing redirection without reaching the IOMMU.  Topology
+can also play a factor in terms of hiding devices.  A PCIe-to-PCI
+bridge masks the devices behind it, making transaction appear as if
+from the bridge itself.  Obviously IOMMU design plays a major factor
+as well.
+
+Therefore, while for the most part an IOMMU may have device level
+granularity, any system is susceptible to reduced granularity.  The
+IOMMU API therefore supports a notion of IOMMU groups.  A group is
+a set of devices which is isolatable from all other devices in the
+system.  Groups are therefore the unit of ownership used by VFIO.
+
+While the group is the minimum granularity that must be used to
+ensure secure user access, it's not necessarily the preferred
+granularity.  In IOMMUs which make use of page tables, it may be
+possible to share a set of page tables between different groups,
+reducing the overhead both to the platform (reduced TLB thrashing,
+reduced duplicate page tables), and to the user (programming only
+a single set of translations).  For this reason, VFIO makes use of
+a container class, which may hold one or more groups.  A container
+is created by simply opening the /dev/vfio/vfio character device.
+
+On its own, the container provides little functionality, with all
+but a couple version and extension query interfaces locked away.
+The user needs to add a group into the container for the next level
+of functionality.  To do this, the user first needs to identify the
+group associated with the desired device.  This can be done using
+the sysfs links described in the example below.  By unbinding the
+device from the host driver and binding it to a VFIO driver, a new
+VFIO group will appear for the group as /dev/vfio/$GROUP, where
+$GROUP is the IOMMU group number of which the device is a member.
+If the IOMMU group contains multiple devices, each will need to
+be bound to a VFIO driver before operations on the VFIO group
+are allowed (it's also sufficient to only unbind the device from
+host drivers if a VFIO driver is unavailable; this will make the
+group available, but not that particular device).  TBD - interface
+for disabling driver probing/locking a device.
+
+Once the group is ready, it may be added to the container by opening
+the VFIO group character device (/dev/vfio/$GROUP) and using the
+VFIO_GROUP_SET_CONTAINER ioctl, passing the file descriptor of the
+previously opened container file.  If desired and if the IOMMU driver
+supports sharing the IOMMU context between groups, multiple groups may
+be set to the same container.  If a group fails to set to a container
+with existing groups, a new empty container will need to be used
+instead.
+
+With a group (or groups) attached to a container, the remaining
+ioctls become available, enabling access to the VFIO IOMMU interfaces.
+Additionally, it now becomes possible to get file descriptors for each
+device within a group using an ioctl on the VFIO group file descriptor.
+
+The VFIO device API includes ioctls for describing the device, the I/O
+regions and their read/write/mmap offsets on the device descriptor, as
+well as mechanisms for describing and registering interrupt
+notifications.
+
+VFIO Usage Example
+-------------------------------------------------------------------------------
+
+Assume user wants to access PCI device 0000:06:0d.0
+
+$ readlink /sys/bus/pci/devices/0000:06:0d.0/iommu_group
+../../../../kernel/iommu_groups/26
+
+This device is therefore in IOMMU group 26.  This device is on the
+pci bus, therefore the user will make use of vfio-pci to manage the
+group:
+
+$ modprobe vfio-pci
+
+Binding this device to the vfio-pci driver creates the VFIO group
+character devices for this group:
+
+$ lspci -n -s 0000:06:0d.0
+06:0d.0 0401: 1102:0002 (rev 08)
+$ echo 0000:06:0d.0 > /sys/bus/pci/devices/0000:06:0d.0/driver/unbind
+$ echo 1102 0002 > /sys/bus/pci/drivers/vfio-pci/new_id
+
+Now we need to look at what other devices are in the group to free
+it for use by VFIO:
+
+$ ls -l /sys/bus/pci/devices/0000:06:0d.0/iommu_group/devices
+total 0
+lrwxrwxrwx. 1 root root 0 Apr 23 16:13 0000:00:1e.0 ->
+	../../../../devices/pci0000:00/0000:00:1e.0
+lrwxrwxrwx. 1 root root 0 Apr 23 16:13 0000:06:0d.0 ->
+	../../../../devices/pci0000:00/0000:00:1e.0/0000:06:0d.0
+lrwxrwxrwx. 1 root root 0 Apr 23 16:13 0000:06:0d.1 ->
+	../../../../devices/pci0000:00/0000:00:1e.0/0000:06:0d.1
+
+This device is behind a PCIe-to-PCI bridge[4], therefore we also
+need to add device 0000:06:0d.1 to the group following the same
+procedure as above.  Device 0000:00:1e.0 is a bridge that does
+not currently have a host driver, therefore it's not required to
+bind this device to the vfio-pci driver (vfio-pci does not currently
+support PCI bridges).
+
+The final step is to provide the user with access to the group if
+unprivileged operation is desired (note that /dev/vfio/vfio provides
+no capabilities on its own and is therefore expected to be set to
+mode 0666 by the system).
+
+$ chown user:use
+
+### 3.4.4 总结 ###
 
 VFIO是一套用户态驱动框架，可用于编写高效用户态驱动；在虚拟化情景下，亦可用来在用户态实现device passthrough。通过VFIO访问硬件并无新意，VFIO可贵之处在于第一次向用户态开放了IOMMU接口，能完全在用户态配置IOMMU，将DMA地址空间映射进而限制在进程虚拟地址空间之内。这对高性能用户态驱动以及在用户态实现device passthrough意义重大。
 

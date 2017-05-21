@@ -89,6 +89,50 @@ X86(包括 x86-32 和 x86-64)架构的CPU默认使用 4KB 大小的内存页面�
 
 缺点：使用 Huge page 的内存不能被换出，也不能使用 ballooning 方式自动增长
 
+# 3. 1GB大页 #
+前面介绍的 大页主要是针对 x86_64 CPU 架构上的 2MB 大小的大页，本节将介绍更大的大页—— 1GB大页，这两者的基本用法和原理是大同小异的。总的来说 1GB 大页和 2MB大页一样，使用了 hugetlbfs(一个基于内存的特殊文件系统)来直接利用硬件提供的大页支持，以便创建共享的或私有的内存映射，这样减少了内存页的数量，提高了 TLB缓存的效率，从而提高了系统的内存访问的性能。
+
+1GB 和 2MB 大页的不同点，主要在于它们的内存页大小不同，且1GB大页的分配只能在Linux系统的内核启动参数中指定，而2MB 大页既可以在启动时内核参数配置，又可以在系统运行中用命令行操作来配置。
+
+下面是KVM环境中1GB大页的具体操作步骤。
+
+1) 检查硬件和内核配置对 1GB 大页的支持，命令行如下：
+
+    # cat /proc/cpuinfo | grep pdpe1gb
+    # grep HUGETLB /boot/config-3.5.0
+    
+2) 在宿主机的内核启动参数中配置 1GB，例如，在启动时使用6个1GB大页的 grub 配置文件如下:
+       
+	title KVM Demo
+        root (hd0,0)
+        kernel (hd0,0) /boot/vmlinuz-3.5.0 ro root=/dev/sda1 hugepagesz=1GB hugepages=6 default_hugepagesz=1GB
+
+default_hugepagesz ： 该值如果不设置，默认值为2MB
+hugepagesz 和 hugepages 选项可以成对地多次使用，可以让系统在启动时同时保留多个大小不同的大页 例如：
+
+     hugepagesz=1GB hugepages=6 default_hugepagesz=1GB hugepagesz=2MB hugepages=512
+
+3) 在启动宿主机后，在宿主机中查看内存信息和内存大页信息，命令行如下：
+
+    # cat /proc/meminfo
+    # hugeadm --pool-list
+
+4) 挂载 hugetlbfs 文件系统
+    
+	# mount -t hugetlbfs hugetlbfs /dev/hugepages
+    也可以使用 pagesize 来指定挂载的页的大小
+    # mount -t hugetlbfs hugetlbfs /dev/hugepages -o pagesize=2MB
+5) 使用 qemu-kvm 命令启动客户机
+
+    # qemu-system-x86_64 -m 6G -smp 2 rhel6u3.qcow -net nic -net tap -mem-path /dev/hugepages/
+    在使用 1GB 大页时，笔者发现，启动客户机的内存不能超过 -mem-path 指定的目录的 1GB 大页的内存量，否则可能会出现 “can'tmmap RAM pages: Cannot allocate memory" 的错信息，从而不会为客户机提供任何大页的实际支持。
+    
+6) 再次查看内存情况
+
+    # cat /proc/meminfo
+    由于对大页的支持需要显式调用 libhugetlb 库函数，实际使用大页的程序并不多。
+    和 2MB 大页一样，使用 1GB 的大页时，存在的问题也是一开始就需要预留大页的内存，不能 swap，不能 ballooning。
+
 # 3. 参考资料
 
 https://www.ibm.com/developerworks/cn/linux/l-cn-hugetlb/   
