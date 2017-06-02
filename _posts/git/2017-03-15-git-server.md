@@ -37,11 +37,11 @@
 	$ cd /home/
 	$ git clone https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm.git
 
-这样最好 crontab 做一个定期同步，例如下面方法，当然可以 rsync 同步。
+这样最好 crontab 做一个定期同步，例如下面方法，当然可以 rsync 同步，当然直接 pull 也可以。
 
 	$ cd /tmp 
 	$ rm -rf kvm.git 
-	$ git clone https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm.git/home/kvm.git
+	$ git clone https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm.git
 	$ rsync -av --delete /tmp/kvm.git  /home/ >> /tmp/tst.log 2>&1
 
 ## 3. git clone
