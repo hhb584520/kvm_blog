@@ -107,6 +107,26 @@
 	假如你想要丢弃你所有的本地改动与提交，可以到服务器上获取最新的版本并将你本地主分支指向到它：
 	 git fetch origin
  	 git reset --hard origin/master
+## 2.7 use patch ##
+
+http://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg01198.html
+
+	[Qemu-devel] [PATCH v9 0/9] VT-d: vfio enablement and misc enhances
+	^^^                 ^^            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	repo name           patch version patch Name
+
+### 2.7.1 找到对应项目 ###
+https://patchwork.kernel.org/
+
+find repo name, for example "Qemu-devel"
+
+https://patchwork.kernel.org/project/qemu-devel/list/
+
+### 2.7.2 建立 filter ###
+在左上角有个 Filters
+
+### 2.7.3 pwclient ###
+https://patchwork.kernel.org/help/pwclient/
 
 # 3. repo
 ## 3.1 建立文件夹
