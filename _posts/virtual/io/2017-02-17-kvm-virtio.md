@@ -7,7 +7,7 @@ KVM是必须使用硬件虚拟化辅助技术（如Intel VT-x、AMD-V）的hyper
 
 QEMU纯软件方式模拟现实世界中的I/O设备的基本过程模型如图5-1所示。
 
-![](/kvm_blog/img/qemu-emulated-io.jpg)
+![](/kvm_blog/files/virt_io/qemu-emulated-io.jpg)
 
 使用QEMU模拟I/O的情况下:
 
