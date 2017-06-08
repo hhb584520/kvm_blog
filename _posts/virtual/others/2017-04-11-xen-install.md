@@ -104,24 +104,19 @@ Edit /boot/grub/grub.conf, one new grub for native Linux is as follow:
 
 For qemu-upstream-unstable.git:
 
-./configure --target-list=x86_64-softmmu  --enable-xen --enable-xen-pci-passthrough
-make
-make install
+	./configure --target-list=i386-softmmu  --enable-xen --enable-xen-pci-passthrough
+	make -j8
+	make install
+
 NOTE: It'll install to /usr/local/ by default
 For qemu.git
 
-**x86**
-
-	./configure --enable-xen --target-list=i386-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
-
-ia32e
-
-	./configure --enable-xen --target-list=x86_64-softmmu --extra-cflags="-I$path_to_xen_source/tools/include -I$path_to_xen_source/tools/libxc -I$path_to_xen_source/tools/xenstore" --extra-ldflags="-L$path_to_xen_source/tools/libxc -L$path_to_xen_source/tools/xenstore"
-
 NOTE: you may need to build xen and xen tools first.
 Please add following two lines in xen configuration file:
-device_model_override = '/usr/local/bin/qemu-system-x86_64'
-device_model_version = 'qemu-xen'
+
+	device_model_override = '/usr/local/bin/qemu-system-i386'
+	device_model_version = 'qemu-xen'
+
 NOTE: ‘device_module_override’ indicates the directory your qemu binary is installed in.
 
 # 2. RPM Install #
