@@ -61,9 +61,35 @@ LMbench 根据配置文档执行完所需要的测试项之后，在results 目�
 
 你也可以将两次测试结果放在一个地方，然后执行上面的命令可以查看比较的结果。
 
-# 3. Other benchmark
-# 3.1 kernel build
+## 3. ps_mem
+ps_mem 是一个可以帮助我们精准获取 Linux 中各个程序核心内存使用情况的简单 python 脚本。这个工具和其它的区别在于其精确显示核心内存使用情况。
+
+### 3.1 install
+
+**redhat:**
+
+	yum install ps_mem
+
+**source install**
+	
+	git clone https://github.com/pixelb/ps_mem.git && cd ps_mem
+	python ps_mem.py
+
+### 3.2 use
+
+	$ ps_mem
+	$ ps_mem --help
+	ps_mem.py - Show process memory usage
+	
+	-h                                 Show this help
+	-w <N>                             Measure and show process memory every N seconds
+	-p <pid>[,pid2,...pidN]            Only show memory usage PIDs in the specified list
+	-s, --show-cmdline                 Show complete program path with options
+
+
+## 3. Other benchmark
+### 3.1 kernel build
 内核编译是一个比较综合的性能评测工具，它广为 Linux 开发者和开源的 VMM 开发者采用。这种方法即对处理器敏感也对内存和硬盘读写敏感。因此，在实践中，内核编译既被用来做内存虚拟化的性能评测工具，也被用作硬盘虚拟化的性能评测工具。
 
-# 3.2 sysbench
+### 3.2 sysbench
 perf cpu 这篇文章中已经提了，这里不再叙述。

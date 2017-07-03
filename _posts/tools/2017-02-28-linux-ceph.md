@@ -1,1 +1,0 @@
-http://www.vpsee.com/2015/07/install-ceph-on-centos-7/

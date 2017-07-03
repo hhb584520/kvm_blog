@@ -588,8 +588,44 @@ IMAP邮件服务：
 
 ## 5.2 for redhat
 
+	$ cat /etc/sysconfig/network/ifcfg-eth2
+		BOOTPROTO='none'
+		BROADCAST=''
+		DHCLIENT_SET_DEFAULT_ROUTE='yes'
+		ETHTOOL_OPTIONS=''
+		IPADDR=''
+		MTU=''
+		NAME='Ethernet Controller 10-Gigabit X540-AT2'
+		NETMASK=''
+		NETWORK=''
+		REMOTE_IPADDR=''
+		STARTMODE='auto'
+	
+	$ cat /etc/sysconfig/network/ifcfg-br2
+		BOOTPROTO='dhcp4'
+		BRIDGE='yes'
+		BRIDGE_FORWARDDELAY='0'
+		BRIDGE_PORTS='eth2'
+		BRIDGE_STP='off'
+		BROADCAST=''
+		DHCLIENT_SET_DEFAULT_ROUTE='yes'
+		ETHTOOL_OPTIONS=''
+		IPADDR=''
+		MTU=''
+		NAME=''
+		NETMASK=''
+		NETWORK=''
+		REMOTE_IPADDR=''
+		STARTMODE='auto'
 
-# 6. 网卡命名机制 ##
+
+# 6.route
+
+https://www.cyberciti.biz/faq/linux-route-add/
+
+	$ mtr -r -c 1 ip_addr
+
+# 7. 网卡命名机制 ##
 1.传统命名：以太网eth[0,1,2,...],wlan[0,1,2,...]
 2.udev支持多种不同的命名方案：UDEV是系统在用户空间探测内核空间，通过sys接口所输出的硬件设备，并配置的硬件设备的一种应用程序，在centos7上UDEV支持多种不同的命名方案，无非就是支持基于固件的命名（firmware,基于主板上rom芯片）或者是通过总线拓扑（PCI总线）结构来命名。总线拓扑（PCI总线）结构命名主要是根据对应设备所在的位置来命名，slot设备上的第几个接口方式命名，这样命名的方式就是能够实现自动命名，只要接口不坏，无论是哪一块网卡插上去其名称一定是固定的。
 名称组成格式：  
@@ -604,6 +640,39 @@ IMAP邮件服务：
 - s<slot>: PCI-E扩展槽的索引号
 - x<MAC>: 基于MAC地址的命名；
 - p<bus>s<slot>:enp2s1
+
+
+# 8. firewalld
+
+Disable FirewallD on RHEL 7
+This topic describes how to stop and disable FirewallD on RHEL 7.
+
+To stop and disable FirewallD
+Check the status of the firewalld service:
+
+	systemctl status firewalld.service
+
+The status displays as active (running) or inactive (dead).
+If the firewall is active / running, enter this command to stop it:
+
+	systemctl stop firewalld.service
+
+To completely disable the firewalld service, so it does not reload when you restart the host machine:
+
+	systemctl disable firewalld.service
+
+Verify the status of the firewalld service:
+
+	systemctl status firewalld.service
+
+The status should display as disabled and inactive (dead).
+
+	firewalld.service - firewalld - dynamic firewall daemon
+	  Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+	  Active: inactive (dead)
+
+Repeat these steps for all host machines.
+The firewalld service is stopped and disabled. You can now start the CLC and other host machines.
 
 
 # 参考资料 #

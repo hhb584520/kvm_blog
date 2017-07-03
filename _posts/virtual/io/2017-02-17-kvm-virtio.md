@@ -350,3 +350,15 @@ KVM模块对于 TSC Deadline Timer的支持开始于 Linux 3.6 版本，QEMU对�
 
 # 参考资料 #
 http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.pdf
+
+http://events.linuxfoundation.org/sites/events/files/slides/Vhost_VIOMMU_merged_0810.pdf
+
+http://www.voidcn.com/blog/majieyue/article/p-6032967.html
+
+http://www.2cto.com/os/201408/329744.html
+
+http://smilejay.com/2012/11/virtio-overview/
+
+http://lingxiankong.github.io/blog/2014/11/17/virtio-blk/
+
+http://oenhan.com/kvm-virtio-block-src

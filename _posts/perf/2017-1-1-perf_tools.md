@@ -1,21 +1,61 @@
-
-
 ##﻿﻿﻿﻿ 1. Perf介绍 ##
+
+Perf 最全介绍 http://www.brendangregg.com/perf.html
+
 ### 1.1 Perf 简介 ###
-Perf 是用来进行软件性能分析的工具。通过它，应用程序可以利用 PMU，tracepoint 和内核中的特殊计数器来进行性能统计。它不但可以分析指定应用程序的性能问题 (per thread)，也可以用来分析内核的性能问题，当然也可以同时分析应用代码和内核，从而全面理解应用程序中的性能瓶颈。最 初的时候，它叫做 Performance counter，在 2.6.31 中第一次亮相。此后他成为内核开发最为活跃的一个领域。在 2.6.32 中它正式改名为 Performance Event，因为 perf 已不再仅仅作为 PMU 的抽象，而是能够处理所有的性能相关的事件。
+Perf 是用来进行软件性能分析的工具。通过它，应用程序可以利用 PMU，tracepoint 和内核中的特殊计数器来进行性能统计。它不但可以分析指定应用程序的性能问题 (per thread)，也可以用来分析内核的性能问题，当然也可以同时分析应用代码和内核，从而全面理解应用程序中的性能瓶颈。最初的时候，它叫做 Performance counter，在 2.6.31 中第一次亮相。此后他成为内核开发最为活跃的一个领域。在 2.6.32 中它正式改名为 Performance Event，因为 perf 已不再仅仅作为 PMU 的抽象，而是能够处理所有的性能相关的事件。
 
-使用 perf，您可以分析程序运行期间发生的硬件事件，比如 instructions retired ，processor clock cycles 等；您也可以分析软件事件，比如 Page Fault 和进程切换。这使得 Perf 拥有了众多的性能分析能力，举例来说，使用 Perf 可以计算每个时钟周期内的指令数，称为 IPC，IPC 偏低表明代码没有很好地利用 CPU。Perf 还可以对程序进行函数级别的采样，从而了解程序的性能瓶颈究竟在哪里等等。Perf 还可以替代 strace，可以添加动态内核 probe 点，还可以做 benchmark 衡量调度器的好坏。
+性能调优工具如 perf，Oprofile 等的基本原理都是对被监测对象进行采样，最简单的情形是根据 tick 中断进行采样，即在 tick 中断内触发采样点，在采样点里判断程序当时的上下文。假如一个程序 90% 的时间都花费在函数 foo() 上，那么 90% 的采样点都应该落在函数 foo() 的上下文中。运气不可捉摸，但我想只要采样频率足够高，采样时间足够长，那么以上推论就比较可靠。因此，通过 tick 触发采样，我们便可以了解程序中哪些地方最耗时间，从而重点分析。稍微扩展一下思路，就可以发现改变采样的触发条件使得我们可以获得不同的统计数据：
 
-### 1.2 背景知识 ###
-有些背景知识是分析性能问题时需要了解的。比如硬件 cache；再比如操作系统内核。应用程序的行为细节往往是和这些东西互相牵扯的，这些底层的东西会以意想不到的方式影响应用程序的性能，比如某些程序无法充分利用 cache，从而导致性能下降。比如不必要地调用过多的系统调用，造成频繁的内核 / 用户切换。等等。方方面面，这里只是为本文的后续内容做一些铺垫，关于调优还有很多东西，我所不知道的比知道的要多的多。
+- 以时间点 ( 如 tick) 作为事件触发采样便可以获知程序运行时间的分布。
+- 以 cache miss 事件触发采样便可以知道 cache miss 的分布，即 cache 失效经常发生在哪些程序代码中。如此等等。
 
-性能相关的处理器硬件特性，PMU 简介
-当算法已经优化，代码不断精简，人们调到最后，便需要斤斤计较了。cache 啊，流水线啊一类平时不大注意的东西也必须精打细算了。
-硬件特性之 cache
-内存读写是很快的，但还是无法和处理器的指令执行速度相比。为了从内存中读取指令和数据，处理器需要等待，用处理器的时间来衡量，这种等待非常漫长。 Cache 是一种 SRAM，它的读写速率非常快，能和处理器处理速度相匹配。因此将常用的数据保存在 cache 中，处理器便无须等待，从而提高性能。Cache 的尺寸一般都很小，充分利用 cache 是软件调优非常重要的部分。
-硬件特性之流水线，超标量体系结构，乱序执行
-提高性能最有效的方式之一就是并行。处理器在硬件设计时也尽可能地并行，比如流水线，超标量体系结构以及乱序执行。
+使用 perf，主要可以分析几类事件：
 
+- perf list hw
+- perf list sw
+- perf list cache
+- perf list pmu
+- perf list tracepoint
+
+### 1.2 PMU ###
+PMU
+
+其中三个事件是fixed counter（固定计数器，参考18.4.1 Fixed-function Performance Counters了解其概念），简单理解它们用于计数对应的预定义的一些事件。
+1. CPU_CLK_UNHALTED
+Programable counter version of the unhalted cycle counter
+表示非停机状态的机器周期数。
+很显然，对于一个程序，这个事件的数目越少越好，表明其运行状态(非停机状态)消耗的机器周期少，即耗时少。其有三个扩展：
+THREAD_P：非停机状态下线程的机器周期。线程在运行HLT指令的时候进入halt state(停机状态)。由于CPU核的频率会不断变化，这个事件数目和时间的比例是变化的。
+TOTAL_CYCLES：CPU机器周期数目的总和，halted+unhalted（除了处于深度睡眠状态）。
+REF_P：线程在非停机状态下，计数base clock(133Mhz)的参考机器周期数目。很显然，这个事件不会被频率影响，就好象是线程运行一直运行在一个最大的频率一样。
+
+2. CPU_CLK_UNHALTED.REF
+Reference cycles when thread is not halted (fixed counter)
+和上面的CPU_CLK_UNHALTED的REF_P的含义相同。
+
+3. CPU_CLK_UNHALTED.THREAD
+Cycles when thread is not halted (fixed counter)
+和上面的CPU_CLK_UNHALTED的THREAD_P的含义相同。
+
+4. INST_RETIRED.ANY
+Instructions retired ( fixed counter ) 
+表示消耗的指令数，计数执行过程中消耗的指令数。
+说明：关于retire，一般表示退休什么的意思，这里其实其含义就是“消耗”，retirement表示指令隐退，或者可以理解为其技术指令从执行到退出的那个退出的次数，自然，其实就表示消耗的指令数了。:)
+对于包含多个微操作(micro-op)的指令，其只对最后一个微操作的指令引退进行计数，即只计数一次。
+
+5. THREAD_ACTIVE
+Cycles thread is active
+线程处于active状态下的机器周期数。
+
+
+性能指标之CPI：
+Clockticks per Instructions Retired (CPI)
+即Cycles per Instructions，表示每一条指令消耗的时钟周期。这是一个基础的性能指标之一，在进行性能分析时，其一般是首先会分析的一个指标。
+很显然，CPI的值越小越好，CPI的计算为：Clockticks / Instructions Retired。如：
+CPI=CPU_CLK_UNHALTED.THREAD/INST_RETIRED.ANY
+说明：如果要计算一个函数的CPI，就使用相应的事件计算，这里的例子是计算整个thread的CPI。
+根据经验值，如果CPI小于0.75，那么认为其性能是不错的。如果大于0.75，就需要考虑进行优化了。 
 
 ## 2. Perf安装 ##
 ### 2.1 Perf编译 ###
@@ -28,11 +68,6 @@ Perf 是用来进行软件性能分析的工具。通过它，应用程序可以
 	 make V=2 ARCH=arm NO_DWARF=1 NO_LIBPERL=1 NO_LIBPYTHON=1 NO_DEMANGLE=1 NO_NEWT=1 NO_OPENSSL=1 NO_SVN_TESTS=1 
 	NO_IPV6=1 NO_ICONV=1 CROSS_COMPILE=~/nfs1/toolchains/arm-2013.05/bin/arm-none-linux-gnueabi-
 
-性能调优工具如 perf，Oprofile 等的基本原理都是对被监测对象进行采样，最简单的情形是根据 tick 中断进行采样，即在 tick 中断内触发采样点，在采样点里判断程序当时的上下文。假如一个程序 90% 的时间都花费在函数 foo() 上，那么 90% 的采样点都应该落在函数 foo() 的上下文中。运气不可捉摸，但我想只要采样频率足够高，采样时间足够长，那么以上推论就比较可靠。因此，通过 tick 触发采样，我们便可以了解程序中哪些地方最耗时间，从而重点分析。稍微扩展一下思路，就可以发现改变采样的触发条件使得我们可以获得不同的统计数据：
-
-- 以时间点 ( 如 tick) 作为事件触发采样便可以获知程序运行时间的分布。
-- 以 cache miss 事件触发采样便可以知道 cache miss 的分布，即 cache 失效经常发生在哪些程序代码中。如此等等。
-    
 ### 2.2 Perf对应内核编译 ###
 
 内核添加： PERF_EVENTS
@@ -80,28 +115,8 @@ Perf 提供了3种用户界面，分别是tui,gtk以及tty。其中可操作性�
 ### 3.2 Perf list，perf 事件 ###
 使用 perf list 命令可以列出所有能够触发 perf 采样点的事件。比如
 
-	 $ perf list 
-	 List of pre-defined events (to be used in -e): 
-	 cpu-cycles OR cycles [Hardware event] 
-	 instructions [Hardware event] 
-	…
-	 cpu-clock [Software event] 
-	 task-clock [Software event] 
-	 context-switches OR cs [Software event] 
-	…
-	 ext4:ext4_allocate_inode [Tracepoint event] 
-	 kmem:kmalloc [Tracepoint event] 
-	 module:module_load [Tracepoint event] 
-	 workqueue:workqueue_execution [Tracepoint event] 
-	 sched:sched_{wakeup,switch} [Tracepoint event] 
-	 syscalls:sys_{enter,exit}_epoll_wait [Tracepoint event] 
-	…
-
-不同的系统会列出不同的结果，在 2.6.35 版本的内核中，该列表已经相当的长，但无论有多少，我们可以将它们划分为三类：
-
-    Perf-list用来查看perf所支持的性能事件，有软件的也有硬件的。
     List all symbolic event types.
-    perf list [hw | sw | cache | tracepoint | event_glob]
+    perf list [hw | sw | cache | tracepoint | pmu]
 
 (1) 性能事件的分布
 
@@ -174,9 +189,9 @@ Perf 提供了3种用户界面，分别是tui,gtk以及tty。其中可操作性�
     通过指定 -e 选项，您可以改变 perf stat 的缺省事件 ( 关于事件，在上一小节已经说明，可以通过 perf list 来查看 )。假如您已经有很多的调优经验，可能会使用 -e 选项来查看您所感兴趣的特殊的事件。
 
 用于分析指定程序的性能概况。
-Run a command and gather performance counter statistics.
-    perf stat [-e <EVENT> | --event=EVENT] [-a] <command>    
-    perf stat [-e <EVENT> | --event=EVENT] [-a] - <command> [<options>]
+
+	perf record -g -a ./test
+	perf report
 
 (2) 常用参数
 
@@ -202,7 +217,8 @@ Run a command and gather performance counter statistics.
         # perf stat -a -A ls > /dev/null
     ls命令执行了多少次系统调用：
         # perf stat -e syscalls:sys_enter ls 
-3.4 perf Top
+
+### 3.4 perf Top
 
 	./perf top -e cpu_clock
 
@@ -825,6 +841,11 @@ perf 的输出虽然是文本格式，但还是不太容易分析和阅读。往
 	    [...]
 该报表分别按进程和按系统调用显示失败的次数。非常简单明了，而如果通过普通的 perf record 加 perf report 命令，则需要自己手工或者编写脚本来统计这些数字。
 我想重要的不仅是学习目前已经存在的这些脚本，而是理解如何利用 perf 的脚本功能开发新的功能。但如何写 perf 脚本超出了本文的范围，要想描述清楚估计需要一篇单独的文章。因此不再赘述。
+
+
+## 5.perf guest ##
+
+https://www.ibm.com/developerworks/community/blogs/IBMzOS/entry/20141104?lang=en
 
 ## 结束语 ##
 

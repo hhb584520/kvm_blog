@@ -44,6 +44,15 @@ lspci -k -s $bdf
 lspci -v -s $bdf | grep SR-IOV  
 查看PCI设备是否支持 SR-IOV 功能
 
+lspci -nvv -s $bdf
+查看该 bdf 的 device id, 像下面的 203f 就是设备 ID.
+
+	fa:00.0 0604: 8086:203f (rev 04) (prog-if 00 [Normal decode])
+	        Physical Slot: 0-2
+	        Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr+ Stepping- SERR+ FastB2B- DisINTx+
+	        Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	        Latency: 0
+
  
 ## 3. 实例 ##
 

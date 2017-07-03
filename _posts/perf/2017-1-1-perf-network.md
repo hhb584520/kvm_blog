@@ -35,6 +35,16 @@ Linux环境下网络性能测试: http://www.samirchen.com/linux-network-perform
 
 http://blog.itpub.net/22664653/viewspace-714569/
 
+Actually there are several differences:
+
+1. IPERF is a well-written modern CLI tool, very simple to use. NETPERF looks like a museum exponate. The simplest tutorial for NETPERF I've found on the web is as easy as learning the Klingon's Kumburan dialect.
+
+2. NETPERF reported invalid bandwidth on some machines. And those machines very just laptops connected over a simple switch.
+
+3. NETSERVER (part of NETPERF) often reports useless machine address, so it would be better to just write nothing than misleading info.
+
+In short, use IPERF.
+
 ## 2.1 netperf
 https://www.ibm.com/developerworks/cn/linux/l-netperf/
 
@@ -80,6 +90,7 @@ netperf: send_omni: send_data failed: Network is unreachable
 netperf -H 10.239.13.122  -t UDP_STREAM -- -R 1 -l 10
 
 ## 2.2 iperf
+https://iperf.fr/iperf-doc.php#3change
 
 # 3. 性能优化
 ## 3.1 intel dpdk ##
@@ -235,3 +246,17 @@ Linux下TCP/IP及内核参数优化有多种方式，参数配置得当可以大
 	#是否接受含有源路由信息的ip包。参数值为布尔值，1表示接受，0表示不接受。
 	#在充当网关的linux主机上缺省值为1，在一般的linux主机上缺省值为0。
 	#从安全性角度出发，建议你关闭该功能。
+
+# 4. 网络流量监测
+## 4.1 检测某个 接口的流量
+
+	$ yum install iftop
+	$ iftop -i eth0
+
+## 4.2 检测具体 tcp/udp 端口流量
+
+	$ yum install iptraf
+	$ iptraf-ng
+	LAN station monitor --> By TCP/UDP port
+
+
