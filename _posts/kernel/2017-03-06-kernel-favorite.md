@@ -58,6 +58,7 @@ https://www.ibm.com/developerworks/cn/linux/l-ipc/
 ## 3.链表 ##
 http://bbs.chinaunix.net/thread-1981115-1-1.html
 
+http://www.roman10.net/2011/07/28/linux-kernel-programminglinked-list/
 如前文所述，Linux内核中的代码，经过稍加改造后，可以在用户态下使用。 
 include/linux/list.h 中的函数和宏，是一组精心设计的API，有比较完整的注释和清晰的思路。在用户态下使用list.h，查看改造后的list.h 
 
@@ -413,6 +414,8 @@ mutex 只能通过官方API管理：它只能使用上节中描述的方法初�
 
 ## 7.4 顺序锁 ##
    
+http://www.wowotech.net/kernel_synchronization/seqlock.html
+
 顺序锁，通常简称 seq 锁，是在2.6版本内核中才引入的一种新型锁。这种锁提供了一种很简单的机制，用于读写共享数据。实现这种锁主要依靠一个序列计数器。当有疑义的数据被写入时，会得到一个锁，并且序列值会增加。在读取序列值之前或之后，序列号都被读取。如果读取的序列号值相同，说明在读操作进行的过程中没有被写操作打断过。此外，如果读取的值是偶数，那么就表明写操作没有发生（要明白因为锁的初值是0，所以写锁会使值成为奇数，释放的时候就变成偶数）。适合以下情况
 
 *  你的数据存在很多读者。

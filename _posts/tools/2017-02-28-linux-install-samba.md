@@ -96,7 +96,7 @@ Samba 是 SMB/CIFS 网络协议的重新实现, 它作为 NFS 的补充使得在
     	comment = All Development File
     	path = /home/development
     	browseable= yes
-    	create mask = 0644
+    	create mask = 0644get
     	directory mask = 0755
     	#valid users = anycto,cnhzz
     	#write list = anycto

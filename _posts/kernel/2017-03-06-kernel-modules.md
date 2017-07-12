@@ -1,4 +1,70 @@
+# Modules
+
+## 1. 参考介绍
 http://www.tldp.org/LDP/lkmpg/2.6/html/index.html
+
+## 2. 错误解决
+	[root@localhost 4.11.0-rc3]# ll
+	total 2896
+	lrwxrwxrwx  1 root root     31 Jul 11 16:07 **build -> /workspace/BUILD/kvm-4.11.0_rc3**
+	drwxr-xr-x 12 root root   4096 Jul 11 16:08 kernel
+	-rw-r--r--  1 root root 777107 Apr 26 17:12 modules.alias
+	......
+	-rw-r--r--  1 root root 423990 Apr 26 17:12 modules.symbols.bin
+	lrwxrwxrwx  1 root root     31 Jul 11 16:08 source -> /workspace/BUILD/kvm-4.11.0_rc3
+
+	$ ln -sf /haibin/linux-stable/ build
+	$ ln -sf /haibin/linux-stable/ source
+	$ cd /haibin/hmmio
+	$ ls
+		bmmio.c  Makefile
+	$ make
+		make -C /lib/modules/4.11.0-rc3/build M=/haibin/hmmio modules
+		make[1]: Entering directory `/haibin/linux-stable'
+		
+		  ERROR: Kernel configuration is invalid.
+		         include/generated/autoconf.h or include/config/auto.conf are missing.
+		         Run 'make oldconfig && make prepare' on kernel src to fix it.	
+		
+		  WARNING: Symbol version dump ./Module.symvers
+		           is missing; modules will have no dependencies and modversions.
+		
+		  Building modules, stage 2.
+		scripts/Makefile.modpost:42: include/config/auto.conf: No such file or directory
+		make[2]: *** No rule to make target `include/config/auto.conf'.  Stop.
+		make[1]: *** [modules] Error 2
+		make[1]: Leaving directory `/haibin/linux-stable'
+		make: *** [all] Error 2
+
+	$ cp /boot/config-4.11.0-rc3 /haibin/linux-stable/.config
+	$ cd /haibin/linux-stable/
+	$ make oldconfig && make prepare
+		HOSTCC  scripts/basic/fixdep
+		HOSTCC  scripts/kconfig/conf.o
+		SHIPPED scripts/kconfig/zconf.tab.c
+		......
+	$ make modules_prepare
+		CHK     include/config/kernel.release
+		CHK     include/generated/uapi/linux/version.h
+		CHK     include/generated/utsrelease.h
+		......
+	$ cd /haibin/hmmio
+	$ make
+		make -C /lib/modules/4.11.0-rc3/build M=/haibin/hmmio modules
+		make[1]: Entering directory `/haibin/linux-stable'
+		
+		  WARNING: Symbol version dump ./Module.symvers
+		           is missing; modules will have no dependencies and modversions.
+		
+		  CC [M]  /haibin/hmmio/bmmio.o
+		  Building modules, stage 2.
+		  MODPOST 1 modules
+		  CC      /haibin/hmmio/bmmio.mod.o
+		  LD [M]  /haibin/hmmio/bmmio.ko
+		make[1]: Leaving directory `/haibin/linux-stable'
+
+
+## 3. 例子
 
 例子 Makefile
 
