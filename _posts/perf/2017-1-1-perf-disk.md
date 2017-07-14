@@ -1,3 +1,11 @@
+io benchmark 总体介绍
+
+http://blog.cloudharmony.com/2010/06/disk-io-benchmarking-in-cloud.html
+
+http://www.slashroot.in/linux-file-system-read-write-performance-test
+
+https://www.jamescoyle.net/how-to/913-simple-bonnie-example
+
 # 1.IOPS的测试benchmark工具 #
 
 IOPS，即I/O per second，即每秒读写（I/O）操作的次数，多用于OLTP/数据库、小文件存储等场合，衡量随机访问的性能。

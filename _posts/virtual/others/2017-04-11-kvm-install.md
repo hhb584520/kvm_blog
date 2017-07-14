@@ -121,7 +121,16 @@ c. Reboot and boot into updated kernel
 	    Comments: Ctrl+Alt+2 --> info kvm 查看是否编译时候使用了 --enable-kvm  
 	    $ make   
 	    $ make install  
-   
+
+
+		[root@kbl-sgx qemu-sgx-master]# ./configure
+		
+		ERROR: DTC (libfdt) version >= 1.4.0 not present. Your options:
+		         (1) Preferred: Install the DTC (libfdt) devel package
+		         (2) Fetch the DTC submodule, using:
+		             git submodule update --init dtc 
+		下载一份 dtc 到 qemu 目录下就好了
+		$ git clone http://git.qemu.org/git/dtc.git 
 
 -  after qemu is installed, check kvm module
     

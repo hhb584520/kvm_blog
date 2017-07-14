@@ -53,8 +53,46 @@ lspci -nvv -s $bdf
 	        Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
 	        Latency: 0
 
- 
-## 3. 实例 ##
+
+## 3. PCIE
+ref:
+
+https://superuser.com/questions/693964/can-i-find-out-if-pci-e-slot-is-1-0-2-0-or-3-0-in-linux-terminal
+
+http://www.edn.com/electronics-news/4380071/What-does-GT-s-mean-anyway-
+
+https://zh.wikipedia.org/zh-cn/PCI_Express
+
+### 3.1 PCIe slot 版本识别
+PCIE 有三个版本，分别是 PCIe 1.1, PCIe 2.0, PCIe 3.0
+
+You can use the "dmidecode" command to give an in depth list of all the hardware on the system and then view that. I did a "quick and dirty" command to show the pertinent bit as follows:
+
+dmidecode | grep "PCI"
+Which returned
+
+PCI is supported
+Type: x16 PCI Express 2 x8
+Type: x8 PCI Express 2 x4
+Type: x8 PCI Express 2 x4
+Type: x8 PCI Express 2 x4
+Type: 32-bit PCI
+
+Using lspci -vv, you can get the transfer rate and compare it with the transfer rate specified for the revisions. A sample output would read:
+
+### 3.2 speed rate
+
+	$ lspci -vv | grep -E 'PCI bridge|LnkCap'
+	00:02.0 PCI bridge: NVIDIA Corporation C51 PCI Express Bridge (rev a1) (prog-if 00 [Normal decode])
+	                LnkCap: Port #2, **Speed 2.5GT/s**, Width x1, ASPM L0s L1, Latency L0 <512ns, L1 <4us
+
+### 3.2 GT/s vs Gb/s
+Most of us are used to seeing bus speeds specified in Gbps, or gigabits per second, but GT/s stands for gigatransfers per second. What’s the difference?
+The difference has to do with the encoding of the data. Because PCIe is a serial bus with the clock embedded in the data, it needs to ensure that enough level transitions (1 to 0 and 0 to 1) occur for a receiver to recover the clock. To increase level transitions, PCIe uses “8b/10b” encoding, where every eight bits are encoded into a 10-bit symbol that is then decoded at the receiver. Thus, the bus needs to transfer 10 bits to send 8 bits of encoded data.
+
+2.5GT/s = 2Gb/s = 2Gbps
+
+## 4. 实例 ##
 
 实例1：不必加上任何选项，就能够显示出目前的硬件配备
 
