@@ -207,6 +207,16 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 	         return 0;
 	}
 
+#### 5.3 mpstat
+
+	mpstat -P ALL -u 1 10 显示CPU使用率
+	mpstat -P ALL -I ALL 1 10显示中断信息
+
+#### 5.4.pidstat
+
+	pidstat -p 'pid' 1 10
+	pidstat -p 'pid' -t -w 1 10 进程和线程的上下文切换次数
+
 # 3. 参考资料 #
 
 http://kernel.org/doc/Documentation/IRQ-affinity.txt

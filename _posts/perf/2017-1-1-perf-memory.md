@@ -99,3 +99,128 @@ ps_mem 是一个可以帮助我们精准获取 Linux 中各个程序核心内存
 
 ### 3.2 sysbench
 perf cpu 这篇文章中已经提了，这里不再叙述。
+
+## 4. free
+
+	[root@vt-nfs kvm_blog]# free -m
+	              total        used        free      shared  buff/cache   available
+	Mem:          15886        1383         174         599       14328       13512
+	Swap:          8191         694        7497
+
+第一行的信息（我们可以认为从操作系统层面看待）
+
+total：总物理内存大小
+
+used：已经分配的大小
+
+free：没有被分配的大小
+
+shared：共享内存的大小，主要用于IPC通信
+
+buffers：用于块设备的缓冲
+
+cached：用于文件内容缓冲，也就是缓存
+
+"缓存"就是在内存中划分一块区域，作为进程和硬盘之间的缓冲区，进程将数据写入缓存中，当那些数据需要读取的时候，就直接去"高速路"缓存中读取，而不会去"土路"硬盘中读取，这样大大的加快性能
+
+这里buffer实际上是存储了我们数据的元数据(包括目录名字，文件大小，文件存储块，修改时间，权限等)，而cache则存放了我们最近读取过的文件。
+
+第三行信息（我们可以认为从应用程序层面看待）
+
+这里的-/+ buffers/cache分别为 -buffers/cache  和  +buffers/cache  两部分
+
+-buffers/cache = used(第一行)-buffers-cached   实际上是当前程序上"真实使用"的"物理内存"
+
++buffers/cache = buffers+cached      意思就是暂时"借给"系统作为"缓冲区"使用的内存大小
+
+used=(+buffers/cached)+(-buffers/cached)
+
+所以从应用程序层面看,可用内存=free memory+buffers+cached
+
+详细信息我们可以通过下面这种方式查看.
+
+  ~ cat /proc/meminfo 
+
+MemTotal:        1020128 kB
+
+MemFree:          670772 kB
+
+Buffers:           97780 kB
+
+Cached:           100980 kB
+
+SwapCached:            0 kB
+
+Active:           164988 kB
+
+Inactive:         117296 kB
+
+Active(anon):      83536 kB
+
+Inactive(anon):      160 kB
+
+Active(file):      81452 kB
+
+Inactive(file):   117136 kB
+
+Unevictable:           0 kB
+
+Mlocked:               0 kB
+
+SwapTotal:             0 kB
+
+SwapFree:              0 kB
+
+Dirty:                92 kB
+
+Writeback:             0 kB
+
+AnonPages:         83504 kB
+
+Mapped:            17500 kB
+
+Shmem:               172 kB
+
+Slab:              46696 kB
+
+SReclaimable:      28652 kB
+
+SUnreclaim:        18044 kB
+
+KernelStack:        1744 kB
+
+PageTables:         2636 kB
+
+NFS_Unstable:          0 kB
+
+Bounce:                0 kB
+
+WritebackTmp:          0 kB
+
+CommitLimit:      510064 kB
+
+Committed_AS:     343800 kB
+
+VmallocTotal:   34359738367 kB
+
+VmallocUsed:        7112 kB
+
+VmallocChunk:   34359727304 kB
+
+HardwareCorrupted:     0 kB
+
+AnonHugePages:     36864 kB
+
+HugePages_Total:       0
+
+HugePages_Free:        0
+
+HugePages_Rsvd:        0
+
+HugePages_Surp:        0
+
+Hugepagesize:       2048 kB
+
+DirectMap4k:        8184 kB
+
+DirectMap2M:     1040384 kB
