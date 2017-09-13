@@ -156,9 +156,15 @@ dstat可以通过传递2个参数运行来控制报告间隔和报告数量。�
 ## 3.1  System Call Interface
    strace
 
-http://lzz5235.github.io/2013/11/22/ltrace-strace-ftrace.html
+   http://lzz5235.github.io/2013/11/22/ltrace-strace-ftrace.html
 
-## 3.2
+## 3.2 sysstat
+
+   wget http://pagesperso-orange.fr/sebastien.godard/sysstat-11.0.0.tar.gz
+   cd sysstat-11.0.0/
+   ./configure
+   make
+   make install
 
 # 4. 综合评测工具
 
