@@ -1,5 +1,13 @@
 # Ubunt 使用 #
 
+- 开启root用户远端登录
+- 修改环境变量
+- 配置开机启动服务
+- PXE
+- 中文字符设置
+- VNC配置
+
+
 ## 1.root用户 ##
 ### 1.1 root修改密码 ###
 ubuntu的root默认是禁止使用的，在安装的时候也没要求你设置root的密码，和红帽系统系列这里是不同的。要使用，给root设置密码就行了。
@@ -283,3 +291,174 @@ http://manpages.ubuntu.com/manpages/precise/en/man5/dhcpd.conf.5.html
 - 下载中文语言包：apt-get install language-pack-zh-hans-base
 - 默认语言设置为中文：运行update-locale LANG=zh_CN.UTF-8和update-locale LANGUAGE=zh_CN.zh
 - 重启系统：reboot，这样就变成中文环境了
+
+
+## 6.VNC配置
+### 6.1 安装桌面配合和VNC服务器
+默认情况下，Ubuntu 16.04 Droplet没有安装图形桌面环境或VNC服务器，因此我们将开始安装它们。 具体来说，我们将为最新的Xfce桌面环境和官方Ubuntu存储库中提供的TightVNC软件包安装软件包。 
+
+在您的服务器上，安装Xfce和TightVNC软件包。 
+
+	$ sudo apt install xfce4 xfce4-goodies tightvncserver
+
+要在安装完成后，VNC服务器的初始配置，使用vncserver命令来设置一个安全的密码。 
+
+	$ vncserver
+
+系统会提示您输入并验证密码，以及仅供查看的密码。 使用仅查看密码登录的用户将无法使用鼠标或键盘控制VNC实例。 如果您想向使用VNC服务器的其他人展示某些内容，但这不是必需的，这是一个有用的选项。 
+
+运行vncserver完成通过创建默认的配置文件和连接信息为我们的服务器使用安装VNC的。 安装这些软件包后，现在可以配置VNC服务器了。
+
+### 6.2 配置 VNC 服务器
+
+首先，我们需要告诉我们的VNC服务器启动时要执行什么命令。 这些命令位于被称为一个配置文件xstartup在.vnc你的home目录下的文件夹中。 当您运行的启动脚本创建vncserver在上一步，但我们需要修改一些针对Xfce桌面的命令。 
+
+VNC时首次设置，它在端口5901启动一个默认的服务器实例此端口被称为显示器端口，并通过VNC所提到的:1 。 VNC可以在其他显示器端口启动多个实例，如:2 ， :3 ，等等。当使用VNC服务器时，请记住:X是指显示器端口5900+X 。 
+
+因为我们将改变VNC服务器的配置，我们需要先停止在端口5901上运行的VNC服务器实例。 
+
+	$ vncserver -kill :1
+
+输出应该看起来像这样，有一个不同的PID： 
+
+	OutputKilling Xtightvnc process ID 17648
+
+我们开始配置新的之前xstartup文件，让备份原件。 
+	
+	$ mv ~/.vnc/xstartup ~/.vnc/xstartup.bak
+
+现在创建一个新xstartup使用文件nano或你喜欢的文本编辑器。 
+
+	$ vim ~/.vnc/xstartup
+
+将这些命令粘贴到文件中，以便在启动或重新启动VNC服务器时自动执行这些命令，然后保存并关闭文件。 
+
+	~/.vnc/xstartup#!/bin/bash
+	xrdb $HOME/.Xresources
+	startxfce4 &
+
+该文件中的第一个命令， xrdb $HOME/.Xresources ，讲述了VNC的GUI框架读取服务器用户.Xresources文件。 .Xresources是用户可以更改图形化桌面的某些设置，如终端的颜色，光标主题，和字体呈现。 第二个命令简单地告诉服务器启动Xfce，在这里你会找到所有的图形软件，你需要舒适地管理你的服务器。 
+
+为确保VNC服务器能够正确使用此新启动文件，我们需要向其授予可执行权限。 
+
+	$ sudo chmod +x ~/.vnc/xstartup
+
+现在，重新启动VNC服务器。 
+	
+	$ vncserver
+
+服务器应该使用类似于以下内容的输出启动： 
+
+	OutputNew 'X' desktop is your_server_name.com:1
+	
+	Starting applications specified in /home/sammy/.vnc/xstartup
+	Log file is /home/sammy/.vnc/liniverse.com:1.log
+
+### 6.3 测试VNC桌面 
+
+在此步骤中，我们将测试VNC服务器的连接性。 
+
+首先，我们需要创建本地计算机上的SSH连接，能够安全地转发到localhost的VNC连接。 您可以通过以下命令在Linux或OS X上的终端执行此操作。 记得替换user和server_ip_address您的服务器的Sudo非root用户名和IP地址。 
+ssh -L 5901:127.0.0.1:5901 -N -f -l username server_ip_address
+
+
+如果您使用的是图形化的SSH客户端，如PuTTY，使用server_ip_address作为连接IP，并设置localhost:5901作为程序的SSH隧道设置的新的转发端口。 
+
+接下来，你现在可以使用VNC客户端尝试在到VNC服务器的连接localhost:5901 。 系统将提示您进行身份验证。 要使用的正确密码是您在第1步中设置的密码。 
+
+### 6.4 创建VNC服务文件 
+接下来，我们将VNC服务器设置为systemd服务。 这将使其可以像任何其他systemd服务一样根据需要启动，停止和重新启动。 
+
+首先，创建一个新的名为单元文件/etc/systemd/system/vncserver@.service用你喜欢的文本编辑器： 
+	
+	$ sudo nano /etc/systemd/system/vncserver@.service
+
+将以下内容复制并粘贴到其中。 一定要改变PIDFILE的值用户的价值和用户名，以配合您的用户名。 
+
+	/etc/systemd/system/vncserver@.service [Unit]
+	Description=Start TightVNC server at startup
+	After=syslog.target network.target
+	
+	[Service]
+	Type=forking
+	User=sammy
+	PAMName=login
+	PIDFile=/home/sammy/.vnc/%H:%i.pid
+	ExecStartPre=-/usr/bin/vncserver -kill :%i > /dev/null 2>&1
+	ExecStart=/usr/bin/vncserver -depth 24 -geometry 1280x800 :%i
+	ExecStop=/usr/bin/vncserver -kill :%i
+	
+	[Install]
+	WantedBy=multi-user.target
+
+保存并关闭文件。 
+
+接下来，让系统知道新的单元文件。 
+
+	$ sudo systemctl daemon-reload
+
+启用单位文件。 
+
+	$ sudo systemctl enable vncserver@1.service
+
+停止VNC服务器的当前实例（如果它仍在运行）。 
+	
+	$ vncserver -kill :1
+
+然后启动它，因为您将启动任何其他systemd服务。 
+	
+	$ sudo systemctl start vncserver@1
+
+您可以验证它以此命令开始： 
+
+	$ sudo systemctl status vncserver@1
+
+如果它正确启动，输出应如下所示： 
+
+输出 
+
+	vncserver@1.service - TightVNC server on Ubuntu 16.04
+	   Loaded: loaded (/etc/systemd/system/vncserver@.service; enabled; vendor preset: enabled)
+	   Active: active (running) since Mon 2016-04-25 03:21:34 EDT; 6s ago
+	  Process: 2924 ExecStop=/usr/bin/vncserver -kill :%i (code=exited, status=0/SUCCESS)
+	...
+	
+	 systemd[1]: Starting TightVNC server on Ubuntu 16.04...
+	 systemd[2938]: pam_unix(login:session): session opened for user finid by (uid=0)
+	 systemd[2949]: pam_unix(login:session): session opened for user finid by (uid=0)
+	 systemd[1]: Started TightVNC server on Ubuntu 16.04.
+
+结论 
+
+您现在应该有一个安全的VNC服务器启动并运行在您的Ubuntu 16.04服务器上。 现在，您将能够使用易于使用和熟悉的图形界面管理您的文件，软件和设置。 
+
+## 7. Proxy
+http://blog.sina.com.cn/s/blog_5397f28a0100p2c6.html
+
+
+1.apt-get proxy 的配置
+
+	sudo gedit /etc/apt/apt.conf 
+
+NOTE：系统里有可能没有这个文件，直接建立一个就行
+输入下面的proxy的配置信息就行
+
+	Acquire::http::Proxy "http://username:password@address:port";
+
+也可以增加ftp和https的proxy
+
+	Acquire::ftp::Proxy "http://username:password@address:port";
+	Acquire::https::Proxy "http://username:password@address:port";
+
+
+2.terminal proxy 配置
+
+	gedit ～/.bashrc
+	输入下面的proxy的配置信息就行
+	export http_proxy=http://username:password@address:port
+	也可以增加ftp和https的proxy
+
+
+3.UI的proxy设置
+
+	点击 System -> Preferences -> Network Proxy
