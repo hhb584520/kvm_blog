@@ -32,6 +32,13 @@ sysbench支持以下几种测试模式：
 ## 1.4 cyclesoak
 http://www.stlinux.com/devel/traceprofile/cyclesoak
 
+## 1.5 HPC
+spec hpc: https://www.spec.org/hpc2002/  
+open-mpi: https://www.open-mpi.org/
+
+## 1.6 stress
+https://linux.die.net/man/1/stress
+
 # 2. CPU 性能优化 #
 ## 2.1 中断亲和性
 
@@ -97,7 +104,7 @@ CPU之间是不共享缓存的，如果进程频繁的在各个CPU间进行切�
   //将某个cpu加入cpu集中       void CPU_SET (int cpu, cpu_set_t *set);        
   //将某个cpu从cpu集中移出     void CPU_CLR (int cpu, cpu_set_t *set);        
   //判断某个cpu是否已在cpu集中设置了  int CPU_ISSET (int cpu, const cpu_set_t *set);
-    
+
 cpu集可以认为是一个掩码，每个设置的位都对应一个可以合法调度的 cpu，而未设置的位则对应一个不可调度的 CPU。换而言之，线程都被绑定了，只能在那些对应位被设置了的处理器上运行。通常，掩码中的所有位都被置位了，也就是可以在所有的cpu中调度。
 
 ### 2.2.4 进程独占CPU ###
@@ -113,10 +120,10 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 
 ### 2.2.5 源代码 ###
 #### 5.1 绑定进程 ####
-	/* bind - simple command-line tool to set CPU * affinity of a given task */#define _GNU_SOURCE 
+	/* bind - simple command-line tool to set CPU * affinity of a given task */#define _GNU_SOURCE
 	#include <stdlib.h>
 	#include <stdio.h>
-	#include <sched.h> 
+	#include <sched.h>
 	int main(int argc, char *argv[]){    
 	    unsigned long new_mask;    
 	    unsigned long cur_mask;    
@@ -137,12 +144,12 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 	         perror("sched_setaffinity");   
 	         return -1;    
 	     }     
-	     
+
 	     if (sched_getaffinity(pid, len, &cur_mask) < 0) {  
 	             perror("sched_getaffinity");   
 	             return -1;    
 	     }     
-	     
+
 	     printf(" pid %d's new affinity: %08lx\n", \pid, cur_mask);     
 	     return 0;
 	 }
@@ -185,17 +192,17 @@ init进程是所有进程的祖先，我们可以设置init进程的affinity来�
 	         }    
 	       }   
 	        pthread_exit(NULL);
-	    } 
-	    
+	    }
+
 	int main(int argc, char *argv[]){    
-	         
+
 	         pthread_t tid;    
-	         
+
 	         if (pthread_create(&tid, NULL, (void *)myfun, NULL) != 0) {        
 	            fprintf(stderr, "thread create failed\n");       
 	             return -1;    
 	         }   
-	         
+
 	         pthread_join(tid, NULL);  
 	         return 0;
 	}
@@ -207,4 +214,3 @@ http://kernel.org/doc/Documentation/IRQ-affinity.txt
 http://kernel.org/doc/Documentation/kernel-parameters.txt
 
 http://www.vpsee.com/2010/07/load-balancing-with-irq-smp-affinity/
-

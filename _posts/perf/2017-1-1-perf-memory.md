@@ -7,13 +7,19 @@
 ### 1.1 STREAM 介绍 ###
 STREAM 是业界广为流行的综合性内存带宽实际性能 测量 工具之一。随着处理器处理核心数量的增多，内存带宽对于提升整个系统性能越发重要，如果某个系统不能够足够迅速地将内存中的数据传输到处理器当中，若干处理核心就会处于等待数据的闲置状态，而这其中所产生的闲置时间不仅会降低系统的效率还会抵消多核心和高主频所带来的性能提升因素。 STREAM 具有良好的空间局部性，是对 TLB 友好、Cache友好的一款测试。STREAM支持Copy 、Scale 、 Add、 Triad四种操作。
 
+	http://www.cs.virginia.edu/stream/stream2
+	tar -xvf stream
+	cd stream &&make
+	numactl -m 0 ./stream_c.exe
+
+
 ### 1.2 下载地址 ###
 http://www.cs.virginia.edu/stream/FTP/Code/
 
 ### 1.3 Ref: ###
 http://blog.csdn.net/maray/article/details/6230912
 
-##2.LMbench
+## 2.LMbench
 ### 2.1 LMbench介绍 ###
 LMbench 是一个使用 GPL 许可证发布的的免费和开源的自由软件。主要关注两个方面：带宽(bandwidth)和延迟(latency)。它还包含了很多简单的基准测试，覆盖了文档读写、内存操作、管道、系统调用、上下文切换、进程创建和销毁、网络等多方面的性能测试。由于是开源的，我们可以对其进行修改。
 
@@ -71,7 +77,7 @@ ps_mem 是一个可以帮助我们精准获取 Linux 中各个程序核心内存
 	yum install ps_mem
 
 **source install**
-	
+
 	git clone https://github.com/pixelb/ps_mem.git && cd ps_mem
 	python ps_mem.py
 
@@ -80,7 +86,7 @@ ps_mem 是一个可以帮助我们精准获取 Linux 中各个程序核心内存
 	$ ps_mem
 	$ ps_mem --help
 	ps_mem.py - Show process memory usage
-	
+
 	-h                                 Show this help
 	-w <N>                             Measure and show process memory every N seconds
 	-p <pid>[,pid2,...pidN]            Only show memory usage PIDs in the specified list
