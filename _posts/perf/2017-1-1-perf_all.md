@@ -12,17 +12,17 @@
 
 ### 1.1 延时
 
-    DDR2   5473MB/s  86.7ns
-    DDR3   6965MB/s  81.8ns
-    L1: 大小  32K， 访存时间 4cycle
-    L2: 大小 256K， 访存时间 12cycle
-    L3: 大小 20M,   访存时间 26-31cycle
-    Memory: 180cycle
-    内存带宽:每秒中 CPU 可以从内存读取的数据量。内存带宽理论值为 内存通道数 * 内存实际运行频率 * 位宽/8，以Intel Xeon 5500/5600系统为例，内存带宽最大值= 6*1333*8=60GB/s，实测数据是理论数据的50%-60%。
-    PCIe: 8GB/s， 每加一级加 200ns
-    SSD Disk: 10us-1ms, 50MB~2GB/s
-    机械 Disk: 5-20ms, 50~200MB/s
-    网卡：100us~1ms, 10MB~10GB/s
+	    DDR2   5473MB/s  86.7ns
+	    DDR3   6965MB/s  81.8ns
+	    L1: 大小  32K， 访存时间 4cycle
+	    L2: 大小 256K， 访存时间 12cycle
+	    L3: 大小 20M,   访存时间 26-31cycle
+	    Memory: 180cycle
+	    内存带宽:每秒中 CPU 可以从内存读取的数据量。内存带宽理论值为 内存通道数 * 内存实际运行频率 * 位宽/8，以Intel Xeon 5500/5600系统为例，内存带宽最大值= 6*1333*8=60GB/s，实测数据是理论数据的50%-60%。
+	    PCIe: 8GB/s， 每加一级加 200ns
+	    SSD Disk: 10us-1ms, 50MB~2GB/s
+	    机械 Disk: 5-20ms, 50~200MB/s
+	    网卡：100us~1ms, 10MB~10GB/s
 
 ## 2. 综合分析工具
 ### 2.1 dstat
@@ -165,3 +165,6 @@ http://lzz5235.github.io/2013/11/22/ltrace-strace-ftrace.html
 dstat -cdlmnpsy
 
 https://linux.cn/article-3215-1.html
+
+# ref
+https://coolshell.cn/articles/7490.html
