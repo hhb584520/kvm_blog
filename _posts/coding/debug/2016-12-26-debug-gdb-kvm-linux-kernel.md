@@ -322,6 +322,54 @@ KVM 需要有 CPU 的支持（Intel vmx 或 AMD svm），在安装 KVM 之前检
 
 如果要退出 gdb，需要先使用 delete 命令清理所有断点，并 detach。
 
+## 2.4 printk
+
+日志级别一共有8个级别，printk的日志级别定义如下（在include/linux/kernel.h中）：
+
+	#define KERN_EMERG 0/*紧急事件消息，系统崩溃之前提示，表示系统不可用*/
+	#define KERN_ALERT 1/*报告消息，表示必须立即采取措施*/
+	#define KERN_CRIT 2/*临界条件，通常涉及严重的硬件或软件操作失败*	/
+	#define KERN_ERR 3/*错误条件，驱动程序常用KERN_ERR来报告硬件的错误*/
+	#define KERN_WARNING 4/*警告条件，对可能出现问题的情况进行警告*/
+	#define KERN_NOTICE 5/*正常但又重要的条件，用于提醒*/
+	#define KERN_INFO 6/*提示信息，如驱动程序启动时，打印硬件信息*/
+	#define KERN_DEBUG 7/*调试级别的消息*/
+
+没有指定日志级别的printk语句默认采用的级别是：DEFAULT_ MESSAGE_LOGLEVEL（这个默认级别一般为<4>,即与KERN_WARNING在一个级别上），其定义在kernel/printk.c中可以找到。
+
+内核可把消息打印到当前控制台上，可以指定控制台为字符模式的终端或打印机等。默认情况下，“控制台”就是当前的虚拟终端。
+
+为了更好地控制不同级别的信息显示在控制台上，内核设置了控制台的日志级别console_loglevel。printk日志级别的作用是打印一定级别的消息，与之类似，控制台只显示一定级别的消息。
+
+当日志级别小于console_loglevel时，消息才能显示出来。控制台相应的日志级别定义如下：
+
+	#define MINIMUM_CONSOLE_LOGLEVEL　 1
+	#define DEFAULT_CONSOLE_LOGLEVEL 　7 
+	int console_printk[4] = {
+		DEFAULT_CONSOLE_LOGLEVEL,
+		DEFAULT_MESSAGE_LOGLEVEL,
+		MINIMUM_CONSOLE_LOGLEVEL,
+		DEFAULT_CONSOLE_LOGLEVEL,
+	};
+  
+如果系统运行了klogd和syslogd，则无论console_loglevel为何值，内核消息都将追加到/var/log/messages中。如果klogd没有运行，消息不会传递到用户空间，只能查看/proc/kmsg。
+
+变量console_loglevel的初始值是DEFAULT_CONSOLE_LOGLEVEL，可以通过sys_syslog系统调用进行修改。调用klogd时可以指定-c开关选项来修改这个变量。如果要修改它的当前值，必须先杀掉klogd，再加-c选项重新启动它。
+
+通过读写/proc/sys/kernel/printk文件可读取和修改控制台的日志级别。查看这个文件的方法如下：
+
+	#cat /proc/sys/kernel/printk
+    	6   4   1   7
+ 
+上面显示的4个数据分别对应控制台日志级别、默认的消息日志级别、最低的控制台日志级别和默认的控制台日志级别。
+
+可用下面的命令设置当前日志级别：
+ 
+	# echo 8 > /proc/sys/kernel/printk
+	# echo 1 4 1 7 > /proc/sys/kernel/printk
+
+这样所有级别<8,(0-7)的消息都可以显示在控制台上.
+
 
 # 参考资料 #
 
