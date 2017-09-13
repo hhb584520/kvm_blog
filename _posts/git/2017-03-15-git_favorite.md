@@ -21,6 +21,20 @@
 		name = xxx
 		email = xxxx@intel.com
 
+## 0.3 stores your password on disk
+    
+	git config credential.helper store
+	
+	which stores your password on disk
+
+	**with a timeout**
+	Use the git-credential-cache which by default stores the password for 15 minutes.
+	git config credential.helper cache
+
+	to set a different timeout, use --timeout (here 5 minutes)
+	git config credential.helper 'cache --timeout=300'
+
+
 # 1. Branch 
 ## 1.1 Local Branch
 分支是用来将特性开发绝缘开来的。在你创建仓库的时候，master 是“默认的”。
