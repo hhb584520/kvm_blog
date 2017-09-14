@@ -173,3 +173,123 @@ C. 可以用在too...to do sth. 结构之中：
 	He knows Spanish as well.    他还懂西班牙语。
 	
 	too 与 as well 一般不用于否定句，否定句中用 either。
+
+## 17. 吃饭
+	
+	breakfast   早餐
+	lunch         中餐
+	supper       普通的晚餐
+	meal          吃饭
+	dinner       宴会；(中午或晚上吃的)正餐
+
+## 18. 时间
+
+	It is five to two = It is one fifty five = It is fifty-five past one
+	1:55
+
+## 19. 五险一金说法
+
+	养老保险：Pension Insurance
+	医疗保险：Medical Insurance
+	失业保险：Unemployment Insurance
+	公积金：Provident fund
+
+## 20. 数字表达
+
+	1-10 one, two , three, four, five, six, seven, eight, nine, ten
+	11-20 eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty
+	21-30 twenty-one, twenty-two, …., thirty
+	40-100 forty, fifty, sixty, seventy, eighty, ninety, a hundred.
+	101 a hundred and one, 200 two hundred, 1000 a(or one)thousand
+	1001 a thousand and one, 1117-one thousand one hundred and seventeen
+	1,925-one thousand one hundred and twenty-five; 2,000-two thousand
+	3,000-three thousand; 5000-five thousand ;  10,000-ten thousand
+	9,999-nine thousand nine hundred and ninety-nine; 10,001-ten thousand and one; 200,000-two hundred thousand; 1,000,000-one million
+
+## 21.职场英语缩写
+	Tmr——tomorrow  明天: eg：We're gonna have a meeting tmr. 我们明天有一个会要开。
+	Pls——please 请         eg：Pls call me back when you're available. 你有空的时候请给我回电话            
+	Thx——Thanks 谢谢  eg：Could you send me an email, thx!  你能发个邮件给我吗？谢谢！                                                                              
+	ASAP——as soon as possible  尽快，越快越好。
+	OT——Overtime  加班eg：You can get triple pay if you do OT on public holiday.
+	BS——brainstorming  头脑风暴 eg：We need more ideas, Why don't we do BS? 
+	BS——bullshit 胡说八道 eg：My friend said the house prices will drop 40% next month, but I think he's talking BS! 
+	BTW——by the way 顺便说一下，或是说句题外话的意思。
+	eg：I'll do the presentation on Monday, btw, when will you send me that report?
+	TBD——To Be Determined/ Discussed待定
+	eg：The Launch date is still TBD. 发布日期还有待商榷。
+	KPI——key performance indicator  关键业绩指标，工作指标。
+	eg: Your salary is based on your KPI. 你的工资是基于你的业绩指标的。 
+	AL——annual leave 年假
+	eg: I'm on AL now, I'll be back on the 25th. 我现在在休年假，25号回来。
+	PS——Photoshop 照片编辑器
+	eg: You'd better PS them before you post.那些照片你最好在上传之前P一下。
+	P.S.——postscript  备注，附言，补充说明
+	eg：We'll have a meeting at headquater tmr. P.S. Don't forget your uniform.
+	我们明天去总部开会，还有，别忘了穿工服！
+	FYI——for your information  你看一下
+	eg：When you forward an email to someone related, you can say: FYI. 当你转发一封邮件给相关人员时，你可以说：FYI.
+	BR——Best Regards 诚挚的问候，祝好
+	eg：we use BR at the end of the email. 我们在邮件的最后会用到BR. 
+
+## 22. 外国地址的具体写法
+
+	北京丰台区示范新村37号403室 
+	Room 403,No.37,ShiFan Residential Quarter,FengTai District,Beijing,China
+	具体写
+	*** 室/房 Room *** *** 村（乡） *** Village 
+	*** 号 No. *** *** 号宿舍 *** Dormitory 
+	*** 楼/层 ***/F *** 住宅区/
+	区 *** Residential Quarter 
+	甲 / 乙 / 丙 / 丁 A / B / C / D *** 巷 / 弄 *** Lane 
+	*** 单元 Unit *** *** 号楼/幢 *** Building 
+	*** 公司 用拼音拼写 *** 厂 *** Factory 
+	*** 酒楼/酒店 *** Hotel *** 路 *** Road 
+	*** 花园 *** Garden *** 街 *** Street 
+	*** 县 *** County *** 镇 *** Town 
+	*** 市 *** City *** 区 *** District 
+	*** 信箱 Mailbox *** *** 省 *** Prov. 
+	****表示序数词******  1st、2nd、3rd、4th……
+	MinHeng District, ZiRi Road, No.751
+	MinHeng District, ZiXing Road, No.880
+	上海市闵行区紫竹科技园紫星路880号,邮编200241,电话021-61165000
+
+
+## 23. 英语词性与缩写
+	名词，Nouns(n.)表示人或事物的名称box,pen,tree,apple
+	代词，Pronouns(pron.)代替名词、数词、形容词We,this,them,myself
+	形容词，Adjectives(adj.)用来修饰名词，表示人或事物的特征good,sad,high,short
+	数词，Numerals(num.)表示数目或顺序one,two,first
+	动词，Verb(v.)表示动作或状态Jump,sing,visit
+	其中：vt.是及物动词（transitive verb）
+	vi.是不及物动词（intransitive verb）
+	副词，Adverbs（adv.)修饰动、形、副等词，表示动作特征there,widely,suddenly
+	冠词，Articles(art.)用在名词前，帮助说明名词所指的范围a,an,the
+	介词，Prepositions(prep.)用在名词或代词前，说明它与别的词的关系in,on,down,up
+	连词，Conjunctions(conj.)表示人或事物的名称if,because,but
+	感叹词，Interjections(int.)代替名词、数词、形容词等oh,hello,hi,yeah
+	
+## 23. 人称代词
+
+	主格/人称代词   	I	  you		he	she	it		one	we	  you		they
+	宾格	            me    you		him	her	it		one	us	  you		them
+	所有格形容词	    my	  your	his	her	its				our	  your	    their
+	所有格代词		mine  yours	his	hers				ours			theirs
+
+
+## 24. 副词
+	
+副词在助动词之后，助动词之后动词还要正常单复数。
+
+- They are now in the garden.
+- He doesn't often go to school on Monday.
+- He always eats his lunch at noon.
+- It  was hot yesterday, but it's still hotter today.
+- I still don't understand what he meant.
+- I write to my family regularly.                                          # 我按时给家里写信
+- He soon finished writeing a symphony                           # 他很快就谱写成一部交响曲。
+- I will write a letter to you soon.                                        # 我会尽快给你写信
+- I really don't mind.                                                            # 我真的不介意。
+- It is repaired regularly.                                                    # 它定期修理
+- She curiously opened the letter addressed to her husband.        # 她抑制不住好奇心，拆开了别人写给她丈夫的信。 
+- He treats the children kindly.                                                 # 他待孩子们和蔼而仁慈。
