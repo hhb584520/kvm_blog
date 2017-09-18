@@ -322,7 +322,6 @@ every(每一)，no(无)，any(若干)及some（一些）可与 one, thing 构成
 	I went nowhere = I didn't go anywhere.
 	I saw no one = I didn't see anyone.
 
-
 ### 7.3 副词
 	
 副词在助动词之后，助动词之后动词还要正常单复数。
@@ -396,3 +395,87 @@ every(每一)，no(无)，any(若干)及some（一些）可与 one, thing 构成
 #### 7.4.4 others
    opposite Sally 在萨莉对面。这时介词短语，作状语，表示 sat 的具体情况。
 
+### 7.5 动词不定式
+在英语中，当一个动词被另一个动词紧随时，它们之间必须加不定式符号(to)。不定式符号后面的动词只能是原形，而不能是过去式或是分词形式。
+
+(1) 不定式作动词的宾语（动词+to...）:
+
+       He wants to buy a car.
+       He hopes to pass the French exam.
+       I want to leave.
+
+(2) 有许多动词可以带名词/代词宾语(通常是人称代词宾格)，后面再跟不定式（动词+名词/宾格代词+to...）
+
+       I want you to carry it.
+       He wants them to listen to it.
+       Tell him to move it.
+
+(3) 不定式的否定形式是在 to 之前加 not：
+
+       He decided not to buy the house.
+       He told me not to close the window.
+       Tell him not to move it.
+       He is telling him not to hurt himself.  She doesn't want him to hurt himself.
+
+
+## 8.比较级
+
+### 8.1 构成
+
+A. 大多数单音节形容词的比较级和最高级的构成是在其原级后面加上 -er 和 -est：
+
+	small -> smaller -> smallest
+	new   -> newer   -> newest
+
+B.许多单音节形容词只有一个元音字母，其末尾为一个辅音字母。在比较级和最高级形式中，这个辅音字母要双写：
+
+	big -> bigger -> biggest
+	thin -> thinner -> thinnest
+
+C.许多单音节形容词以-e结尾，如nice。这些形容词只需在原级形式后加 -r 和 -st
+
+	large -> larger -> largest
+	nice  -> nicer  -> nicest
+
+D.有些形容词以-y 结尾，而在 -y 前是一个辅音字母。这些形容词一般有两个音节。变为比较级和最高级时，-y 要变成 -i, 再加 -er 和 -est
+
+	easy -> easier -> easiest
+	heavy -> heavier -> heaviest
+
+E.但有少数形容词的比较级是不规则的，必须熟记，
+
+	good -> better -> best
+	bad   -> worse -> worst
+	many/much -> more -> most
+	little -> less -> least
+	far -> farther -> farthest
+		-> further -> furthest
+
+F.大多数较长的形容词（即有两个以上音节的词）可与 more 连用构成其比较级形式，与most 连用构成最高级形式。
+
+### 8.2 用法
+
+比较级只用于两者之间，通常与 than 连用。形容词比较级之所指如果很清楚，它也可以独立存在。
+
+	This coat is longer.    这件外衣较长
+
+最高级用于 3者或3者以上。形容词的最高级在使用时必须加定冠词，并常伴有一个表示 范围的介词短语或从句。
+
+	That girl is the tallest student in our class.
+
+### 8.3 形容词的平级比较级：as ... as
+
+
+形容词的比较形式有3种：较高比较级（more expensive, the most expensive）；较低比较级（less expensive, the least expensive）；平级比较级（as expensive as）。
+
+	The green apple is as sweet as the red one.        这个绿苹果同那个红苹果一样甜。
+	The policeman is as tall as  the policewoman      这个男警察和女警察一样高。
+	The white knife is as sharp as the black one.      这把白色的小刀与黑色的小刀一样锋利。
+	I don't know as many people as you do.            我认识的人没有你认识的多。
+	Robert is not as old as he looks.                        罗伯特没有他看上去那么高。
+	The blue car is not as clean as the red car.         蓝车没有红车干净。
+
+### 8.4 others
+
+    I've ever been.    我所见过的
+    定语从句，分别修饰 the best, the worst.
