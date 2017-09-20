@@ -95,6 +95,17 @@
         git commit -m "代码提交信息"
         现在，你的改动已经提交到了 HEAD，但是还没到你的远端仓库。
 
+	g. modify author
+		You can change author of last commit using the command below.		
+		$ git commit --amend --author="Author Name <email@address.com>"
+		
+		However, if you want to change more than one commits author name, it's a bit tricky. 
+		You need to start an interactive rebase then mark commits as edit then ammend them one by one and finish.
+		
+		Start rebasing with git rebase -i. It will show you something like this. 
+		$ git rebase -i
+
+
 ## 2.4 提交Patch
       git am -3 -i -s -u <patch>
       git push 
