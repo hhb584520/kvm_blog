@@ -1,19 +1,25 @@
-## 后台执行一个进程并获取PID ##
+# 常用命令
+## 去除空行和注释行
+	cat postgresql.conf | grep -v "^$" | grep -v "^#"
+
+
+## 后台执行一个进程并获取PID
     
     SLEEP=$1
     /bin/bash -c "while true ; do continue ; done" & pid=$!
     sleep $SLEEP
     kill -9 $pid
 
-## 增加一条输出 ##
-    grep “hhb” -A 1
+## 向后/向前增加一条输出
+    grep “hhb” -A/B 1
 
-## 替代分割符号中某个符号 ##
+## 替代分割符号中某个符号
 
     echo "12:90,45:90" | tr , '.'
     用点替代其中的逗号
 
-## run program and do not display the output ##
+## 运行程序不要输出
+
      72 # run program and do not display the output
      73 function run_quiet()
      74 {
