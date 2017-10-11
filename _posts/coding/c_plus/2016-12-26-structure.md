@@ -1,3 +1,5 @@
+# Structure
+
 ## 1. 栈的介绍 ##
 
 **确定入栈顺序，如何求出不正确的出栈顺序**
@@ -59,7 +61,14 @@ root-->node 叫深度，node --> 自身最低叶子节点， 叫高度
 它们需要更多的局部调整，尤其是在查找期间。
 一系列查找操作中的某一个可能耗时较长，这在实时应用程序中可能是个不足之处。
 
-# 4. 结构体打包技艺 #
+
+## 4.List
+### 4.1 Simple List
+
+	#include <stdio.h>
+	#include <malloc.h>
+
+## 5. 结构体打包技艺 #
 
 ![](/kvm_blog/files/coding_cplus/structure_package.gif)
 

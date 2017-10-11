@@ -226,6 +226,9 @@ $ git config credential.helper store
 	$ cat ~/.git-credentials
 	https://git-scm.com/book/zh/v2/Git-%E5%B7%A5%E5%85%B7-%E5%87%AD%E8%AF%81%E5%AD%98%E5%82%A8
 
+## 4.3 Config gitolite
+https://git-scm.com/book/en/v1/Git-on-the-Server-Gitolite
+
 # 5. Log #
 ## 5.1 查看某个文件变更情况
 

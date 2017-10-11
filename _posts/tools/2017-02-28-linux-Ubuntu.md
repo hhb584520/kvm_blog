@@ -40,6 +40,53 @@ permission denied
     [plain] view plain copy 在CODE上查看代码片派生到我的代码片
     restart ssh  
 
+### 1.3 configure ip
+
+**Static IP**
+
+vim /etc/networking/interfaces 
+
+	auto lo
+	iface lo inet loopback
+	
+	auto eth0
+	iface eth0 inet static # This is why I think it's setup as a static IP
+	  address 192.168.0.10
+	  netmask 255.255.255.0
+	  network 192.168.0.0
+	  broadcast 192.168.0.255
+	  gateway 192.168.0.1
+	  # I'm pretty sure I typed these in during setup; they have nothing to do with a DNS
+	  dns-nameservers 192.168.0.1
+	  dns-search ironjack.spacetechnology.net
+
+**DHCP IP**
+
+
+	1.Make sure all dhclient processes are killed:
+	sudo killall dhclient
+		
+	See below for why I think this is needed on your system in the state it's in.
+	
+	2.Leave the interfaces file alone for the moment.
+		
+	3.Bring the interface down.
+	sudo ifdown eth0
+	
+	4.Reconfigure the interfaces file to this:
+	
+	auto lo
+	iface lo inet loopback
+	
+	auto eth0
+	iface eth0 inet dhcp
+	
+	5.Bring the interface up again:
+	sudo ifup eth0
+
+ 
+
+
 ## 2.修改环境变量 ##
 Ubuntu Linux系统环境变量配置文件： 
 
