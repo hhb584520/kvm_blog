@@ -190,6 +190,101 @@ There are several built-in functions to perform conversion from one data type to
 **oct(x)**:Converts an integer to an octal string.
 
 
+## 3.class
+### 3.1 private method
+
+	$ cat test.py
+	class Se:
+	
+	    def __in(self):
+	        print "Bet you can't see me..."
+	
+	    def ac(self):
+	        print "the secret message is:"
+	        self.__in()
+	
+	s = Se()
+	s.ac()
+	s.__in()
+
+
+	s.__in()
+	AttributeError: Se instance has no attribute '__in'
+
+### 3.2 static variable
+
+	$ cat selftest.py
+	class Mc:
+	    members = 0
+	    def init(self):
+	        Mc.members += 1
+	
+	m1 = Mc()
+	m1.init()
+	print Mc.members
+	
+	m2 = Mc()
+	m2.init()
+	print Mc.members
+
+### 3.3 self variable
+	class Mc:
+	    def init(self):
+	        self.members = 1
+	
+	m1 = Mc()
+	m1.init()
+	print m1.members
+	
+	m2 = Mc()
+	m2.init()
+	print m2.members
+
+### 3.4 inherit
+	$ cat inherit.py
+	#!/usr/bin/python
+	# Filename: inherit.py
+	
+	class SchoolMember:
+	    '''Represents any school member.'''
+	    def __init__(self, name, age):
+	        self.name = name
+	        self.age = age
+	        print '(Initialized SchoolMember:%s)' % self.name
+	
+	    def tell(self):
+	        '''Tell my details.'''
+	        print 'Name:"%s" Age:"%s"' % (self.name, self.age)
+	
+	class Teacher(SchoolMember):
+	    '''Represents a teacher.'''
+	    def __init__(self, name, age, salary):
+	        SchoolMember.__init__(self, name, age)
+	        self.salary = salary
+	        print'(Initialized Teacher: %s)'% self.name
+	
+	    def tell(self):
+	        SchoolMember.tell(self)
+	        print'Salary: "%d"'% self.salary
+		
+	class Student(SchoolMember):
+	    '''Represents a student.'''
+	    def __init__(self, name, age, marks):
+	        SchoolMember.__init__(self, name, age)
+	        self.marks = marks
+	        print'(Initialized Student: %s)'% self.name
+	
+	    def tell(self):
+	        SchoolMember.tell(self)
+	        print'Salary: "%d"'% self.marks
+	
+	t = Teacher('Mrs.shrividya', 40, 3000)
+	s = Student('Swaroop', 22, 75)
+	
+	members = [t, s]
+	for member in members:
+	    member.tell()
+
 
 ## 10.参考资料
 ### 10.1 Eclipse 环境搭建 ##
@@ -198,7 +293,7 @@ http://lztang1964.blog.163.com/blog/static/187545985201302310814922/
 http://www.huqiwen.com/2012/05/01/spring3-mvc-quick-start-1/
 
 ### 10.2 Python工程及学习书籍 ##
-i
+
 http://www.cnblogs.com/realh/archive/2010/10/04/1841907.html
 
 ### 10.3 Python 连ia ##

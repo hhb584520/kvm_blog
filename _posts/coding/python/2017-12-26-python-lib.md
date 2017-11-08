@@ -268,6 +268,8 @@ https://www.tutorialspoint.com/python/python_sending_email.htm
 	except SMTPException:
 	    print "Error: unable to send email"
 
+## 7.request session
+http://docs.python-requests.org/zh_CN/latest/user/advanced.html
 
 ## 8. database
 ### 8.1 install mysql

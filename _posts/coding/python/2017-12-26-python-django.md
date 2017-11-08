@@ -1,3 +1,38 @@
+
+# Django
+
+## 1. Django Introduction
+
+
+## 2. Django REST framework
+
+http://www.django-rest-framework.org/api-guide/status-codes/
+
+	from rest_framework import status
+	from rest_framework.response import Response
+	from rest_framework.views import APIView
+	from newton.pub.msapi import extsys
+	
+	DEBUG=True
+	class Extensions(APIView):
+	
+	    def __init__(self):
+	        self._logger = logger
+	
+	    def get(self, request, vimid=""):
+	        logger.debug("Extensions--get::data> %s" % request.data)
+
+            content = {
+                "cloud-owner":cloud_owner,
+                "cloud-region-id":cloud_region_id,
+                "vimid":vimid,
+                "extensions": "haibin"
+            }
+            return Response(data=content, status=status.HTTP_200_OK)
+
+
+
+## 3. Others
 https://github.com/django/django.git
 http://djangobook.py3k.cn/2.0/chapter01/
 
