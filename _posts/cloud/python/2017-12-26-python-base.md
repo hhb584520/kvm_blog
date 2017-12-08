@@ -1,8 +1,83 @@
 # 基本语法 #
 https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 
-## 1. loops
-### 1.1 for loops
+## 0.init
+### 0.1 import function
+
+	unap@honap:~/test/tosca$ cat tran/common/utils.py
+	
+	def add(a, b):
+	    c = a + b
+	    return c
+
+	unap@honap:~/test/tosca$ cat tran/shell.py
+	import sys
+	from tran.common.utils import hhb
+	#import trans.common.utils as yui
+
+	def main(args=None):
+	    if args is None:
+	        args = sys.argv[1:]
+	        print args
+	        print add(1,2)
+            # print yui.add(1,2)
+	
+	
+	if __name__ == '__main__':
+	    main()
+
+### 0.2 import class
+
+	unap@honap:~/test/tosca$ cat tran/common/utils.py
+	class Oper:
+	    def add(self, a, b):
+	        c = a + b
+	        return c
+
+	unap@honap:~/test/tosca$ cat tran/shell.py
+	import sys
+	from tran.common.utils import Oper
+
+	def main(args=None):
+	    if args is None:
+	        args = sys.argv[1:]
+	        print args
+			oper1 = Oper()
+	        print add(1,2)
+	
+	
+	if __name__ == '__main__':
+	    main()
+
+### 0.3 自动执行
+	add "#!/usr/bin/env python" to hello.py head
+	$ chmod a+x hello.py
+	$ hello.py
+
+## 1.option #
+### 1.1 python -m
+	unap@honap:~/test/tosca/tran$ cat shell.py
+	import sys
+	
+	def main(args=None):
+	    if args is None:
+	        args = sys.argv[1:]
+	        print args
+	
+	
+	if __name__ == '__main__':
+	    main()
+	
+	
+	unap@honap:~/test/tosca/tran$ PYTHONPATH=$PYTHONPATH:. python -m shell yui ert
+	['yui', 'ert']
+
+### 1.2 python -c
+
+	python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < openwrt-vnf.yaml
+
+## 2. loops
+### 2.1 for loops
 
 	#!/usr/bin/python
 	
@@ -15,7 +90,18 @@ https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 	
 	print "Good bye!"
 
-### 1.2 while loops
+
+	>>> names = ['hhb', 'ywh']
+	>>> for i in range(len(names)):
+	...     print names[i]
+	...
+	hhb
+	ywh
+	>>> names.index('ywh')
+	1
+
+
+### 2.2 while loops
 
 	#!/usr/bin/python
 	
@@ -26,7 +112,7 @@ https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 	
 	print "Good bye!"
 
-### 1.3 nested loops
+### 2.3 nested loops
 
 	#!/usr/bin/python
 	
@@ -41,14 +127,57 @@ https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 	
 	print "Good bye!"
 
-### 1.4 Control Statement
+### 2.4 Control Statement
 
 	break
 	continue
 	pass
 
-## 2. Variable
-### 2.1 Global Variable
+## 3. if
+
+	x == y      x 等于 y
+	x < y       x 小于 y
+	x <= y      x 小于等于 y
+	x != y      x 不等于 y
+    x is y      x 和 y 是同一个对象
+    x is not y  x 和 y 不是同一个对象
+    x in y      x 是 y 容器(例如：序列)的成员
+    x not in y  x 不是 y 容器(例如：序列)的成员
+
+## 3.1 int compare
+
+	def letterGrade(score):
+	    if score >= 90:
+	        letter = 'A'
+	    elif score >= 80:
+	        letter = 'B'
+	    elif score >= 70:
+	        letter = 'C'
+	    elif score >= 60:
+	        letter = 'D'
+	    else:
+	        letter = 'F'
+	    return letter
+
+## 3.2 string compare
+	
+    if(action == "get"):
+	    resp = requests.get(url, verify=False)
+	    content = resp.json()
+	
+	elif(action == "post"):
+	    headers = {'Content-Type': 'application/json',}
+	    resp = requests.post(url, headers=headers, data=json.JSONEncoder().encode(request.data), verify=False)
+	    content = resp.json()
+	
+	elif (action == "delete"):
+	    resp = requests.delete(url, verify=False)
+	    content = resp.json()
+            
+
+
+## 4. Variable
+### 4.1 Global Variable
 	$ cat check_events_log.py
 
 	jpgdata=''
@@ -60,7 +189,7 @@ https://www.tutorialspoint.com/python/python_command_line_arguments.htm
 	openlogfile()
 	print jpgdata
 
-### 2.2 Variable Types
+### 4.2 Variable Types
 Python has five standard data types −
 
 - Numbers(int, long, float, complex)
@@ -81,6 +210,22 @@ undefine variable: del var1
 		print str * 2      # Prints string two times
 		print str + "TEST" # Prints concatenated string
 
+		>>> str1="yuisdf"
+		>>> str1[0:6:2]  # 隔一个字符取一个，默认是连续
+		'yid' 
+
+
+**分割字符串**
+
+		image = "openwrt-image"
+	    m = re.search(r'^([0-9a-zA-Z]+)-([0-9a-zA-Z]+)$', image)
+	 	name = m.group(1)
+
+		image="openwrt-image"
+		m = image.split('-')
+		print m[0]
+		'openwrt'
+
 - List
 
 To some extent, lists are similar to arrays in C. One difference between them is that all the items belonging to a list can be of different data type.
@@ -96,6 +241,18 @@ To some extent, lists are similar to arrays in C. One difference between them is
 	print list[2:]      # Prints elements starting from 3rd element
 	print tinylist * 2  # Prints list two times
 	print list + tinylist # Prints concatenated lists
+
+	>>> list1=['we',786]
+	>>> list2=['op']
+	>>> list1+list2
+	['we', 786, 'op']
+	>>> list1*5
+	['we', 786, 'we', 786, 'we', 786, 'we', 786, 'we', 786]
+	>>> 'we' in list1
+	True
+	>>> 'we' in list2
+	False
+
 
 - Tuple
 
@@ -130,7 +287,7 @@ Dictionaries are enclosed by curly braces ({ }) and values can be assigned and a
 	
 	print dict['one']       # Prints value for 'one' key
 	print dict[2]           # Prints value for 2 key
-	print tinydict          # Prints complete dictionary
+	print tinydict          # Prints complete dictionaryi
 	print tinydict.keys()   # Prints all the keys
 	print tinydict.values() # Prints all the values
 
@@ -169,7 +326,33 @@ Dictionaries are enclosed by curly braces ({ }) and values can be assigned and a
 	
 	show_all()
 
-### 2.3 Data Type Conversion
+	>>> labels = {'phone':'181', 'addr':'yqf'}
+	>>> labels['phone']='189'
+	>>> labels.has_key('ho')
+	False
+	>>> labels.get('phone')
+	'189'
+
+	>>> d = {'x':1, 'y':2}
+	>>> for key in d:
+	...     print key, 'corresponds to', d[key]
+	...
+	y corresponds to 2
+	x corresponds to 1
+
+	>>> for key, value in d.items():
+	...     print key, value
+
+
+**字典引用**
+
+	labels['phone']='189'
+	dict_data["topology_template"]["node_templates"]["VDU1"]["properties"]["image"]
+
+
+
+
+### 4.3 Data Type Conversion
 
 Sometimes, you may need to perform conversions between the built-in types. To convert between types, you simply use the type name as a function.
 
@@ -189,9 +372,39 @@ There are several built-in functions to perform conversion from one data type to
 
 **oct(x)**:Converts an integer to an octal string.
 
+### 4.4 进制
 
-## 3.class
-### 3.1 private method
+	>>> 0xAF        # 16进制
+	175
+	>>> 010         # 8 进制
+	8 
+
+## 5.input/output
+### 5.1 获取用户输入
+	>>> input("The meaning of lif:")
+	The meaning of life: 42
+    42
+
+### 5.2 交互变量值
+
+	>>> x, y, z = 1, 2, 3
+	>>> print x, y, z
+	1 2 3
+	>>> x, y = y, x
+	>>> print x, y, z
+	2 1 3
+
+### 5.3 序列解包
+	>>> scoundrel = {'name':'hhb', 'gf':'ywh'}
+	>>> key, value = scoundrel.popitem()
+	>>> print key, value
+	gf ywh
+	>>> print scoundrel
+	{'name': 'hhb'}
+	>>>
+
+## 5.class
+### 5.1 private method
 
 	$ cat test.py
 	class Se:
@@ -211,7 +424,7 @@ There are several built-in functions to perform conversion from one data type to
 	s.__in()
 	AttributeError: Se instance has no attribute '__in'
 
-### 3.2 static variable
+### 5.2 static variable
 
 	$ cat selftest.py
 	class Mc:
@@ -227,7 +440,7 @@ There are several built-in functions to perform conversion from one data type to
 	m2.init()
 	print Mc.members
 
-### 3.3 self variable
+### 5.3 self variable
 	class Mc:
 	    def init(self):
 	        self.members = 1
@@ -240,7 +453,7 @@ There are several built-in functions to perform conversion from one data type to
 	m2.init()
 	print m2.members
 
-### 3.4 inherit
+### 5.4 inherit
 	$ cat inherit.py
 	#!/usr/bin/python
 	# Filename: inherit.py
@@ -284,6 +497,7 @@ There are several built-in functions to perform conversion from one data type to
 	members = [t, s]
 	for member in members:
 	    member.tell()
+
 
 
 ## 10.参考资料

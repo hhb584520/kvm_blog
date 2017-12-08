@@ -2,6 +2,9 @@
 # Django
 
 ## 1. Django Introduction
+manage.py 源码解析
+
+http://www.cnblogs.com/fangyuan1004/p/4539148.html
 
 
 ## 2. Django REST framework

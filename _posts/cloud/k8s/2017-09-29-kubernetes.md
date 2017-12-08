@@ -23,12 +23,21 @@ Kubernetes是Google开源的容器集群管理系统，其提供应用部署、�
 2) Kubernetes的构件，包括Master组件、Kubelet、Proxy的详细介绍。
 
 # 3. Kubernetes主要概念 #
+容器提供了强大的隔离功能，所以有必要把为 Service提供服务的这组进程放入容器中进行隔离。为此 k8s 设计了 Pod对象，将每个服务进程包装到相应的 Pod中，使其成为 Pod 中运行的一个容器。为了建立 Service 和 Pod 见的关联关系，K8s首先给每个 Pod 贴上一个标签（Label），给运行 MySQL的Pod贴上 name=mysql 标签，给运行 PHP 的 Pod 就贴上 name=php 标签，然后给相应的 Service 定义标签选择器（Label Selector），比如 MySQL Service 的标签选择器的选择条件为 name=mysql，意为该 Service 要作用于所有包含 name=mysql Label的Pod上。这样一来，就巧妙地解决了 Service 与 Pod 的关联问题。
+
 ## 3.1. Pods ##
 
 Pod是Kubernetes的基本操作单元，把相关的一个或多个容器构成一个Pod，通常Pod里的容器运行相同的应用。Pod包含的容器运行在同一个Minion(Host)上，看作一个统一管理单元，共享相同的volumes和network namespace/IP和Port空间。
 
 ## 3.2. Services ##
 Services也是Kubernetes的基本操作单元，是真实应用服务的抽象，每一个服务后面都有很多对应的容器来支持，通过Proxy的port和服务selector决定服务请求传递给后端提供服务的容器，对外表现为一个单一访问接口，外部不需要了解后端如何运行，这给扩展或维护后端带来很大的好处。
+
+在 Kubernetes 中，Service是分布式集群架构的核心，一个 Service 对象拥有如下关键特征
+
+- 拥有一个唯一指定的名字（比如 my-mysql-server）；
+- 拥有一个虚拟 IP (Cluster IP/Service IP/VIP) 和端口号；
+- 能够提供某种远程服务能力； 
+- 被映射到了提供这种服务能力的一组容器应用上。
 
 ## 3.3. Replication Controllers
 

@@ -108,6 +108,7 @@
 	eg：When you forward an email to someone related, you can say: FYI. 当你转发一封邮件给相关人员时，你可以说：FYI.
 	BR——Best Regards 诚挚的问候，祝好
 	eg：we use BR at the end of the email. 我们在邮件的最后会用到BR. 
+	MOU：Memorandum of understanding
 
 ### 2.2 英语词性与缩写
 	名词，Nouns(n.)表示人或事物的名称box,pen,tree,apple
@@ -226,6 +227,9 @@ much 只能修饰不可数名词，many 只能修饰可数名词复数
 ### 5.2 时间表达
 	It is five to two = It is one fifty five = It is fifty-five past one
 	1:55
+
+	The clock stop at five to twelve.
+	The clock stop at 2 minutes pass twelve.
 
 ### 5.3 晚些时候
    late that morning 那天上午的晚些时候。
